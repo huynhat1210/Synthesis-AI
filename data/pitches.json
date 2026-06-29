@@ -1,0 +1,92 @@
+[
+  {
+    "id": "5BUL-P-LQzpQ1_b2YRFC7",
+    "createdAt": "2026-06-29T04:20:23.929Z",
+    "date": "Jun 29, 2026",
+    "context": {
+      "targetAudience": "A conservative finance committee focused on ROI and risk mitigation with a desire to streamline operations.",
+      "pitchGoal": "Freelance Project Proposal",
+      "style": "Persuasive",
+      "length": "Medium"
+    },
+    "pitch": {
+      "scenarioA": {
+        "label": "Scenario A: Freelance Project Proposal (Strategic)",
+        "title": "Strategic Workflow Efficiency Gains",
+        "content": "Hi, I'm Jane Doe, a Lead Strategic Designer. I specialise in UI/UX Design, Product Strategy, Data Visualization. For A conservative finance committee focused on ROI and risk mitigation with a desire to streamline operations., I propose a calculated approach focusing on reducing overhead and maximising output. Based on past projects, we can increase product velocity while keeping risks minimal.",
+        "bullets": [
+          "15% increase in operational efficiency within Q1",
+          "Phased feature rollouts with clear milestone mapping",
+          "Direct alignment with your risk-mitigation goals"
+        ],
+        "headline": "↑ 15% Efficiency"
+      },
+      "scenarioB": {
+        "label": "Scenario B: Freelance Project Proposal (Visionary)",
+        "title": "Disrupting the Product Experience",
+        "content": "Let's build something truly impactful. As a Lead Strategic Designer, I believe the best solutions are simple and delightful. I'm designing a modern, friction-free journey that eliminates redundant steps and ships features your users will love.",
+        "stats": [
+          {
+            "label": "Rapid Prototyping",
+            "icon": "rocket",
+            "value": "2× faster"
+          },
+          {
+            "label": "User Engagement",
+            "icon": "lightbulb"
+          }
+        ]
+      }
+    },
+    "profileSnap": {
+      "fullName": "Jane Doe",
+      "jobTitle": "Lead Strategic Designer"
+    },
+    "starred": false
+  },
+  {
+    "id": "H2PHdMaXwhgf6_pXSkmy2",
+    "createdAt": "2026-06-29T04:20:14.044Z",
+    "date": "Jun 29, 2026",
+    "context": {
+      "targetAudience": "A conservative finance committee focused on ROI and risk mitigation with a desire to streamline operations.",
+      "pitchGoal": "Freelance Project Proposal",
+      "style": "Persuasive",
+      "length": "Medium"
+    },
+    "pitch": {
+      "scenarioA": {
+        "label": "Scenario A: Freelance Project Proposal (Strategic)",
+        "title": "Strategic Workflow Efficiency Gains",
+        "content": "Hi, I'm Jane Doe, a Lead Strategic Designer. I specialise in UI/UX Design, Product Strategy, Data Visualization. For A conservative finance committee focused on ROI and risk mitigation with a desire to streamline operations., I propose a calculated approach focusing on reducing overhead and maximising output. Based on past projects, we can increase product velocity while keeping risks minimal.",
+        "bullets": [
+          "15% increase in operational efficiency within Q1",
+          "Phased feature rollouts with clear milestone mapping",
+          "Direct alignment with your risk-mitigation goals"
+        ],
+        "headline": "↑ 15% Efficiency"
+      },
+      "scenarioB": {
+        "label": "Scenario B: Freelance Project Proposal (Visionary)",
+        "title": "Disrupting the Product Experience",
+        "content": "Let's build something truly impactful. As a Lead Strategic Designer, I believe the best solutions are simple and delightful. I'm designing a modern, friction-free journey that eliminates redundant steps and ships features your users will love.",
+        "stats": [
+          {
+            "label": "Rapid Prototyping",
+            "icon": "rocket",
+            "value": "2× faster"
+          },
+          {
+            "label": "User Engagement",
+            "icon": "lightbulb"
+          }
+        ]
+      }
+    },
+    "profileSnap": {
+      "fullName": "Jane Doe",
+      "jobTitle": "Lead Strategic Designer"
+    },
+    "starred": false
+  }
+]

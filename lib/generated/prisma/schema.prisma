@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DATABASE MODELS
+// ─────────────────────────────────────────────────────────────────────────────
+
+model MasterProfile {
+  id          String       @id @default(uuid())
+  userId      String
+  profileName String       @default("Default Profile")
+  isDefault   Boolean      @default(false)
+  fullName    String
+  jobTitle    String
+  bio         String
+  skills      String[] // Supported natively by PostgreSQL
+  projects    Project[]
+  pitches     SavedPitch[]
+}
+
+model Project {
+  id          String        @id @default(uuid())
+  title       String
+  description String
+  image       String?
+  outcome     String?
+  year        Int?
+  profileId   String        @default("default")
+  profile     MasterProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model SavedPitch {
+  id        String   @id
+  createdAt DateTime @default(now())
+  date      String
+  starred   Boolean  @default(false)
+  note      String?
+
+  // JSON formats mapping directly to the frontend's TypeScript interfaces
+  context     Json // ClientContext
+  pitch       Json // GeneratedPitch (Scenario A & B)
+  profileSnap Json // { fullName, jobTitle, avatarUrl }
+
+  profileId String        @default("default")
+  profile   MasterProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,38 @@
+{
+  "fullName": "Jane Doe",
+  "jobTitle": "Lead Strategic Designer",
+  "bio": "Helping companies translate complex, multi-sided user needs into elegant, high-velocity digital products. Over 8 years of leading cross-functional teams in high-growth environments.",
+  "skills": [
+    "Product Strategy",
+    "Data Visualization",
+    "User Research"
+  ],
+  "projects": [
+    {
+      "id": "1",
+      "title": "Project Alpha",
+      "description": "Redesign of enterprise dashboard, increasing day-to-day workflow efficiency by 40%.",
+      "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop&q=60",
+      "tags": [
+        "Figma",
+        "React",
+        "Design System"
+      ],
+      "outcome": "40% efficiency gain",
+      "year": 2025
+    },
+    {
+      "id": "2",
+      "title": "FinTech Pivot",
+      "description": "Led cross-functional product design team to launch a next-generation asset trading application.",
+      "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&auto=format&fit=crop&q=60",
+      "tags": [
+        "Product Design",
+        "FinTech",
+        "UX Research"
+      ],
+      "outcome": "Launched in 3 markets",
+      "year": 2024
+    }
+  ]
+}

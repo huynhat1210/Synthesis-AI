@@ -79,6 +79,13 @@ export function PitchActions({ pitch, profile }: PitchActionsProps) {
           </div>`
         : "";
 
+    const isVi = ctx.lang === "vi" || (pitch.context && pitch.context.lang === "vi");
+    const labelA = isVi ? "Đề xuất Chiến lược — Kịch bản A" : "Strategic Proposal — Scenario A";
+    const labelB = isVi ? "Phương án Thay thế — Kịch bản B" : "Alternative Approach — Scenario B";
+    const labelGoal = isVi ? "Mục tiêu Đề xuất" : "Proposal Goal";
+    const labelPrepared = isVi ? "Chuẩn bị cho" : "Prepared For";
+    const labelPillars = isVi ? "Các điểm trọng tâm chiến lược" : "Strategic Focus Pillars";
+
     /* ── Profile Skills HTML ── */
     const skillsHtml =
       profile.skills && profile.skills.length > 0
@@ -457,11 +464,11 @@ html,body{
   <!-- Document Title & Context Block -->
   <div class="context-block">
     <div class="context-col">
-      <span class="label">Proposal Goal</span>
+      <span class="label">${labelGoal}</span>
       <div class="context-val" style="font-weight: 700;">${sanitize(ctx.pitchGoal)}</div>
     </div>
     <div class="context-col left-border">
-      <span class="label">Prepared For</span>
+      <span class="label">${labelPrepared}</span>
       <div class="context-val">${sanitize(ctx.targetAudience)}</div>
     </div>
   </div>
@@ -473,20 +480,20 @@ html,body{
     <div class="pdf-main">
       <!-- Scenario A -->
       <div class="section">
-        <span class="label">Strategic Proposal — Scenario A</span>
+        <span class="label">${labelA}</span>
         <div class="pitch-title">${sanitize(p.scenarioA.title)}</div>
         <div class="body">${sanitize(p.scenarioA.content)}</div>
       </div>
 
       ${bulletsHtml ? `
       <div class="section" style="margin-bottom: 24px;">
-        <div class="pillars-head">Strategic Focus Pillars</div>
+        <div class="pillars-head">${labelPillars}</div>
         <table class="pillars-table"><tbody>${bulletsHtml}</tbody></table>
       </div>` : ""}
 
       <!-- Scenario B -->
       <div class="scenb section">
-        <div class="scenb-label">Alternative Approach — ${sanitize(p.scenarioB.label)}</div>
+        <div class="scenb-label">${labelB}</div>
         <div class="scenb-title">${sanitize(p.scenarioB.title)}</div>
         <div class="scenb-body">${sanitize(p.scenarioB.content)}</div>
         ${statsHtml}

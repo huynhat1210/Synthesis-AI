@@ -807,8 +807,8 @@ ${currentResult.scenarioB.content}
                       </motion.div>
                     ) : (
                       <motion.div key="viewA" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                        <h4 className="text-xl font-serif text-primary font-bold mb-3 tracking-tight">
-                          {currentResult.scenarioA.title}
+                        <h4 className="text-xl font-sans text-primary font-bold mb-3 tracking-tight">
+                          {currentResult.scenarioA.title.normalize("NFC")}
                         </h4>
                         <p className="text-sm text-on-surface-variant leading-relaxed mb-5">
                           {currentResult.scenarioA.content}

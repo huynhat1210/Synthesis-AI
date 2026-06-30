@@ -453,11 +453,34 @@ ${currentResult.scenarioB.content}
           <div className="absolute top-0 left-0 w-full h-1.5 bg-secondary"></div>
 
           <div>
-            <div className="border-b border-outline-variant pb-4 mb-6">
+            <div className="border-b border-outline-variant pb-4 mb-6 flex justify-between items-center">
               <h3 className="text-lg font-bold font-geist text-primary flex items-center gap-2 uppercase">
                 <Sparkles className="w-5 h-5 text-secondary" />
                 {t.generatePitchHeader}
               </h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setInputs({
+                    targetAudience: "",
+                    pitchGoal: "Freelance Project Proposal",
+                    style: "Persuasive",
+                    length: "Medium",
+                    selectedSkills: [],
+                    toneValue: 50,
+                    lang: lang,
+                  });
+                  showNotification(
+                    lang === "vi" ? "Đã xóa trắng toàn bộ ô nhập liệu!" : "All inputs cleared!",
+                    "success"
+                  );
+                }}
+                className="text-[10px] text-secondary hover:text-secondary/80 flex items-center gap-1.5 font-bold uppercase cursor-pointer hover:bg-secondary/5 px-2.5 py-1 rounded-lg border border-secondary/20 transition-all active:scale-95 shadow-sm bg-white"
+                title={lang === "vi" ? "Xóa trắng toàn bộ ô nhập liệu" : "Clear all input fields"}
+              >
+                <X className="w-3.5 h-3.5" />
+                <span>{lang === "vi" ? "Xóa trắng" : "Clear"}</span>
+              </button>
             </div>
 
             <div className="space-y-5">

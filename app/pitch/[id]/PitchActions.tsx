@@ -1,12 +1,13 @@
 /**
  * @file app/pitch/[id]/PitchActions.tsx
  * @description Client component — action buttons for the public pitch page.
- *              Handles PDF export with a clean, professional layout including
- *              the full Master Profile (About Me, Skills, Projects).
+ *              Handles PDF export with a clean, single-scenario layout based on
+ *              the active query parameter (?scenario=A or ?scenario=B).
  */
 "use client";
 
 import React, { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { FileDown, Copy, Check } from "lucide-react";
 import type { SavedPitch, MasterProfile } from "@/types";
 
@@ -16,13 +17,25 @@ interface PitchActionsProps {
 }
 
 /**
- * Strips all HTML tags and decodes common entities from a string.
+ * Normalizes Vietnamese text and removes double spaces and odd LLM accent gaps.
+ */
+function cleanVietnamese(text: string): string {
+  if (!text) return "";
+  return text
+    .normalize("NFC")
+    .replace(/\s+/g, " ")
+    .replace(/([áàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹ])\s+([cmnptuyo]|ng|nh|ch)\b/gi, "$1$2")
+    .trim();
+}
+
+/**
+ * Strips all HTML tags, cleans Vietnamese typos/gaps, and decodes common entities.
  * Prevents AI-generated hyperlinks from rendering in the PDF print window.
  */
 function sanitize(text: string): string {
   if (!text) return "";
-  return text
-    .normalize("NFC")
+  const cleaned = cleanVietnamese(text);
+  return cleaned
     .replace(/<[^>]*>/g, "")            // strip all HTML tags
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
@@ -35,6 +48,9 @@ function sanitize(text: string): string {
 
 export function PitchActions({ pitch, profile }: PitchActionsProps) {
   const [copied, setCopied] = useState(false);
+  const searchParams = useSearchParams();
+  const scenarioParam = searchParams?.get("scenario");
+  const activeScenario = scenarioParam === "B" ? "B" : "A";
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -54,6 +70,16 @@ export function PitchActions({ pitch, profile }: PitchActionsProps) {
       month: "long",
       year: "numeric",
     });
+
+    const isVi = ctx.lang === "vi" || (pitch.context && pitch.context.lang === "vi");
+    const labelA = isVi ? "Đề xuất Chiến lược — Kịch bản A" : "Strategic Proposal — Scenario A";
+    const labelB = isVi ? "Phương án Thay thế — Kịch bản B" : "Alternative Approach — Scenario B";
+    const labelGoal = isVi ? "Mục tiêu Đề xuất" : "Proposal Goal";
+    const labelPrepared = isVi ? "Chuẩn bị cho" : "Prepared For";
+    const labelPillars = isVi ? "Các điểm trọng tâm chiến lược" : "Strategic Focus Pillars";
+    const labelMetrics = isVi ? "Chỉ số Hiệu suất Dự kiến" : "Projected Focus Metrics";
+
+    const isA = activeScenario === "A";
 
     /* ── Scenario A bullets ── */
     const bulletsHtml =
@@ -78,13 +104,6 @@ export function PitchActions({ pitch, profile }: PitchActionsProps) {
               .join("")}
           </div>`
         : "";
-
-    const isVi = ctx.lang === "vi" || (pitch.context && pitch.context.lang === "vi");
-    const labelA = isVi ? "Đề xuất Chiến lược — Kịch bản A" : "Strategic Proposal — Scenario A";
-    const labelB = isVi ? "Phương án Thay thế — Kịch bản B" : "Alternative Approach — Scenario B";
-    const labelGoal = isVi ? "Mục tiêu Đề xuất" : "Proposal Goal";
-    const labelPrepared = isVi ? "Chuẩn bị cho" : "Prepared For";
-    const labelPillars = isVi ? "Các điểm trọng tâm chiến lược" : "Strategic Focus Pillars";
 
     /* ── Profile Skills HTML ── */
     const skillsHtml =
@@ -111,6 +130,30 @@ export function PitchActions({ pitch, profile }: PitchActionsProps) {
             )
             .join("")
         : "";
+
+    const leftColumnHtml = isA
+      ? `<!-- Scenario A -->
+         <div class="section">
+           <span class="label">${labelA}</span>
+           <div class="pitch-title">${sanitize(p.scenarioA.title)}</div>
+           <div class="body">${sanitize(p.scenarioA.content)}</div>
+         </div>
+         ${bulletsHtml ? `
+         <div class="section" style="margin-bottom: 24px;">
+           <div class="pillars-head">${labelPillars}</div>
+           <table class="pillars-table"><tbody>${bulletsHtml}</tbody></table>
+         </div>` : ""}`
+      : `<!-- Scenario B -->
+         <div class="section">
+           <span class="label">${labelB}</span>
+           <div class="pitch-title">${sanitize(p.scenarioB.title)}</div>
+           <div class="body">${sanitize(p.scenarioB.content)}</div>
+         </div>
+         ${statsHtml ? `
+         <div class="section" style="margin-bottom: 24px;">
+           <div class="pillars-head">${labelMetrics}</div>
+           ${statsHtml}
+         </div>` : ""}`;
 
     const htmlContent = `<!DOCTYPE html>
 <html lang="vi">
@@ -318,41 +361,6 @@ html,body{
 }
 .pillars-table tr:last-child td{border-bottom: none}
 
-/* ─── SCENARIO B BOX ─── */
-.scenb{
-  background: #f8f9fa;
-  border-left: 4px solid #111;
-  border-radius: 0 8px 8px 0;
-  padding: 20px 22px;
-  margin-top: 28px;
-  border-top: 1px solid #eaeaea;
-  border-right: 1px solid #eaeaea;
-  border-bottom: 1px solid #eaeaea;
-  page-break-inside: avoid;
-}
-.scenb-label{
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: #777;
-  margin-bottom: 8px;
-}
-.scenb-title{
-  font-size: 15px;
-  font-weight: 700;
-  color: #111;
-  margin-bottom: 10px;
-  line-height: 1.35;
-}
-.scenb-body{
-  font-size: 12px;
-  color: #3b3b3b;
-  line-height: 1.7;
-  text-align: justify;
-  text-justify: inter-word;
-}
-
 /* ─── STATS GRID ─── */
 .stats{
   display: grid;
@@ -476,28 +484,9 @@ html,body{
   <!-- 2-COLUMN LAYOUT -->
   <div class="pdf-grid">
     
-    <!-- LEFT COLUMN: Scenarios -->
+    <!-- LEFT COLUMN: Active Scenario -->
     <div class="pdf-main">
-      <!-- Scenario A -->
-      <div class="section">
-        <span class="label">${labelA}</span>
-        <div class="pitch-title">${sanitize(p.scenarioA.title)}</div>
-        <div class="body">${sanitize(p.scenarioA.content)}</div>
-      </div>
-
-      ${bulletsHtml ? `
-      <div class="section" style="margin-bottom: 24px;">
-        <div class="pillars-head">${labelPillars}</div>
-        <table class="pillars-table"><tbody>${bulletsHtml}</tbody></table>
-      </div>` : ""}
-
-      <!-- Scenario B -->
-      <div class="scenb section">
-        <div class="scenb-label">${labelB}</div>
-        <div class="scenb-title">${sanitize(p.scenarioB.title)}</div>
-        <div class="scenb-body">${sanitize(p.scenarioB.content)}</div>
-        ${statsHtml}
-      </div>
+      ${leftColumnHtml}
     </div>
 
     <!-- RIGHT COLUMN: Sidebar (Bio, Skills, Projects) -->

@@ -7,13 +7,25 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Sparkles, Zap, ChevronRight, CheckCircle, Check, Copy, Share2, TrendingUp, X, RefreshCw, FileUp, FileDown, BookOpen, Pencil, LayoutTemplate, Lightbulb, Plus } from "lucide-react";
+import { Sparkles, Zap, ChevronRight, CheckCircle, Check, Copy, Share2, TrendingUp, X, RefreshCw, FileUp, FileDown, BookOpen, Pencil, LayoutTemplate, Lightbulb, Plus, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import type { MasterProfile, ClientContext, GeneratedPitch } from "@/types";
 import { translations, type Language } from "@/lib/translations";
 import { suggestSkillsAction } from "@/actions/suggestSkills";
 import { PROFILE_TEMPLATES } from "@/lib/templates";
+
+/**
+ * Normalizes Vietnamese text and removes double spaces and odd LLM accent gaps.
+ */
+function cleanVietnamese(text: string): string {
+  if (!text) return "";
+  return text
+    .normalize("NFC")
+    .replace(/\s+/g, " ")
+    .replace(/([áàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹ])\s+([cmnptuyo]|ng|nh|ch)\b/gi, "$1$2")
+    .trim();
+}
 
 interface DashboardViewProps {
   profile: MasterProfile;
@@ -37,6 +49,7 @@ interface DashboardViewProps {
   handlePdfUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   parsingPdf: boolean;
   lang: Language;
+  handlePublishScenario: (scenario: "A" | "B") => void;
 }
 
 export function DashboardView({
@@ -61,6 +74,7 @@ export function DashboardView({
   handlePdfUpload,
   parsingPdf,
   lang,
+  handlePublishScenario,
 }: DashboardViewProps) {
   const t = translations[lang];
 
@@ -736,6 +750,17 @@ ${currentResult.scenarioB.content}
                       {currentResult.scenarioA.label}
                     </span>
                     <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
+                      {/* View & Export PDF Button */}
+                      <button
+                        onClick={() => handlePublishScenario("A")}
+                        className="flex items-center gap-1 px-2 py-1 hover:bg-secondary/15 rounded text-secondary hover:text-secondary-container transition-all cursor-pointer text-[10px] font-bold border border-secondary/20"
+                        title={lang === "vi" ? "Xem & Xuất PDF" : "View & Export PDF"}
+                      >
+                        <Globe className="w-3 h-3" />
+                        <span>{lang === "vi" ? "Xem & Xuất PDF" : "View & Export"}</span>
+                      </button>
+
                       {/* Feature 1: Edit button for Scenario A */}
                       <button
                         onClick={startEditA}
@@ -760,6 +785,7 @@ ${currentResult.scenarioB.content}
                           <Copy className="w-4 h-4" />
                         )}
                       </button>
+                    </div>
                     </div>
                   </div>
 
@@ -807,11 +833,11 @@ ${currentResult.scenarioB.content}
                       </motion.div>
                     ) : (
                       <motion.div key="viewA" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                        <h4 className="text-xl font-sans text-primary font-bold mb-3 tracking-tight">
-                          {currentResult.scenarioA.title.normalize("NFC")}
+                        <h4 className="text-xl font-sans text-primary font-bold mb-3 tracking-tight text-justify">
+                          {cleanVietnamese(currentResult.scenarioA.title)}
                         </h4>
-                        <p className="text-sm text-on-surface-variant leading-relaxed mb-5">
-                          {currentResult.scenarioA.content}
+                        <p className="text-sm text-on-surface-variant leading-relaxed mb-5 text-justify">
+                          {cleanVietnamese(currentResult.scenarioA.content)}
                         </p>
                       </motion.div>
                     )}
@@ -842,7 +868,17 @@ ${currentResult.scenarioB.content}
                     <span className="bg-white/10 text-secondary-container px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">
                       {currentResult.scenarioB.label}
                     </span>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
+                      {/* View & Export PDF Button */}
+                      <button
+                        onClick={() => handlePublishScenario("B")}
+                        className="flex items-center gap-1 px-2 py-1 hover:bg-white/15 rounded text-secondary-container hover:text-white transition-all cursor-pointer text-[10px] font-bold border border-white/10"
+                        title={lang === "vi" ? "Xem & Xuất PDF" : "View & Export PDF"}
+                      >
+                        <Globe className="w-3 h-3" />
+                        <span>{lang === "vi" ? "Xem & Xuất PDF" : "View & Export"}</span>
+                      </button>
+
                       {/* Feature 1: Edit button for Scenario B */}
                       <button
                         onClick={startEditB}
@@ -914,11 +950,11 @@ ${currentResult.scenarioB.content}
                       </motion.div>
                     ) : (
                       <motion.div key="viewB" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                        <h4 className="text-xl font-sans font-bold text-white mb-3 tracking-tight">
-                          {currentResult.scenarioB.title}
+                        <h4 className="text-xl font-sans font-bold text-white mb-3 tracking-tight text-justify">
+                          {cleanVietnamese(currentResult.scenarioB.title)}
                         </h4>
-                        <p className="text-sm text-gray-300 leading-relaxed mb-5">
-                          {currentResult.scenarioB.content}
+                        <p className="text-sm text-gray-300 leading-relaxed mb-5 text-justify">
+                          {cleanVietnamese(currentResult.scenarioB.content)}
                         </p>
                       </motion.div>
                     )}

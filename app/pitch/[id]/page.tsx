@@ -1,8 +1,8 @@
 /**
  * @file app/pitch/[id]/page.tsx
  * @description Publicly accessible client-facing landing page.
- *              Displays the optimized pitch alongside the professional's profile and projects.
- *              Securely fetches from database via readPitchPublic (does not require Clerk auth).
+ *              Displays the selected optimized pitch scenario alongside the professional's profile.
+ *              Supports `?scenario=A` or `?scenario=B` filtering.
  */
 import React from "react";
 import Link from "next/link";
@@ -13,10 +13,24 @@ import { PitchActions } from "./PitchActions";
 
 interface PitchPageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ scenario?: string }>;
 }
 
-export default async function PublicPitchPage({ params }: PitchPageProps) {
+/**
+ * Normalizes Vietnamese text and removes double spaces and odd LLM accent gaps.
+ */
+function cleanVietnamese(text: string): string {
+  if (!text) return "";
+  return text
+    .normalize("NFC")
+    .replace(/\s+/g, " ")
+    .replace(/([áàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹ])\s+([cmnptuyo]|ng|nh|ch)\b/gi, "$1$2")
+    .trim();
+}
+
+export default async function PublicPitchPage({ params, searchParams }: PitchPageProps) {
   const { id } = await params;
+  const { scenario } = await searchParams;
   const data = await readPitchPublic(id);
 
   if (!data) {
@@ -30,6 +44,18 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
     skills: [],
     projects: [],
   };
+
+  const isVi = data.context.lang === "vi";
+  const activeScenario = scenario === "B" ? "B" : "A";
+
+  const labelA = isVi ? "Đề xuất Chiến lược — Kịch bản A" : "Strategic Proposal — Scenario A";
+  const labelB = isVi ? "Phương án Thay thế — Kịch bản B" : "Alternative Approach — Scenario B";
+  const labelPillars = isVi ? "Các điểm trọng tâm chiến lược" : "Strategic Focus Pillars";
+
+  const isA = activeScenario === "A";
+  const title = isA ? data.pitch.scenarioA.title : data.pitch.scenarioB.title;
+  const content = isA ? data.pitch.scenarioA.content : data.pitch.scenarioB.content;
+  const label = isA ? labelA : labelB;
 
   return (
     <div className="min-h-screen bg-[#070913] text-gray-100 font-sans selection:bg-secondary/30 selection:text-white">
@@ -71,61 +97,43 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
           <div className="lg:col-span-7 space-y-8">
             <div className="space-y-4">
               <span className="text-xs text-secondary-container uppercase font-bold tracking-widest">
-                Optimized Proposal for {data.context.targetAudience.normalize("NFC")}
+                {label} for {cleanVietnamese(data.context.targetAudience)}
               </span>
               <h1 className="text-3xl md:text-4xl font-geist text-white font-black leading-tight tracking-tight">
-                {data.pitch.scenarioA.title.normalize("NFC")}
+                {cleanVietnamese(title)}
               </h1>
-              <p className="text-base text-gray-300 leading-relaxed">
-                {data.pitch.scenarioA.content.normalize("NFC")}
+              <p className="text-base text-gray-300 leading-relaxed text-justify">
+                {cleanVietnamese(content)}
               </p>
             </div>
 
-            {/* Strategic proof points */}
-            {data.pitch.scenarioA.bullets && data.pitch.scenarioA.bullets.length > 0 && (
+            {/* Strategic focus pillars (for Scenario A) */}
+            {isA && data.pitch.scenarioA.bullets && data.pitch.scenarioA.bullets.length > 0 && (
               <div className="border border-white/10 rounded-xl p-6 bg-white/5 space-y-4">
                 <h3 className="text-xs font-bold text-secondary-container uppercase tracking-wider">
-                  Strategic Focus Pillars
+                  {labelPillars}
                 </h3>
                 <ul className="space-y-3">
                   {data.pitch.scenarioA.bullets.map((bullet, idx) => (
                     <li key={idx} className="flex items-start gap-3 text-sm text-gray-300 leading-relaxed">
                       <CheckCircle className="w-5 h-5 text-secondary-container mt-0.5 shrink-0" />
-                      <span>{bullet.normalize("NFC")}</span>
+                      <span className="text-justify">{cleanVietnamese(bullet)}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             )}
 
-            {/* Visionary Alternate Scenario */}
-            <div className="border border-white/5 rounded-xl p-6 bg-[#0c1020] space-y-4">
-              <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">
-                  Alternative Vision: {data.pitch.scenarioB.label.normalize("NFC")}
-                </span>
-                <span className="text-[10px] bg-secondary/20 text-secondary-container px-2 py-0.5 rounded font-semibold uppercase">
-                  Agile
-                </span>
+            {/* Stats Grid (for Scenario B) */}
+            {!isA && data.pitch.scenarioB.stats && data.pitch.scenarioB.stats.length > 0 && (
+              <div className="grid grid-cols-2 gap-3">
+                {data.pitch.scenarioB.stats.map((stat, idx) => (
+                  <div key={idx} className="bg-white/5 rounded-xl p-4 border border-white/10 flex flex-col justify-between min-h-[70px]">
+                    <p className="text-xs text-gray-300 font-medium leading-relaxed text-justify">{cleanVietnamese(stat.label)}</p>
+                  </div>
+                ))}
               </div>
-              <h4 className="text-lg font-bold text-white">
-                {data.pitch.scenarioB.title.normalize("NFC")}
-              </h4>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                {data.pitch.scenarioB.content.normalize("NFC")}
-              </p>
-
-              {/* Scenario B Stats */}
-              {data.pitch.scenarioB.stats && data.pitch.scenarioB.stats.length > 0 && (
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/10">
-                  {data.pitch.scenarioB.stats.map((stat, idx) => (
-                    <div key={idx} className="bg-white/5 rounded-lg p-3 border border-white/10">
-                      <p className="text-[11px] text-gray-400 leading-snug">{stat.label}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            )}
 
             {/* Bottom Mobile Download Button */}
             <div className="flex justify-center lg:hidden pt-4">
@@ -145,9 +153,9 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
                 {profile.fullName.slice(0, 1).toUpperCase() || "P"}
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">{profile.fullName.normalize("NFC")}</h2>
+                <h2 className="text-lg font-bold text-white">{cleanVietnamese(profile.fullName)}</h2>
                 <p className="text-xs text-secondary-container font-semibold mt-0.5">
-                  {profile.jobTitle.normalize("NFC")}
+                  {cleanVietnamese(profile.jobTitle)}
                 </p>
               </div>
             </div>
@@ -155,7 +163,7 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
             {/* Biography */}
             <div className="space-y-2">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">About Me</h3>
-              <p className="text-xs text-gray-300 leading-relaxed">{profile.bio.normalize("NFC")}</p>
+              <p className="text-xs text-gray-300 leading-relaxed text-justify">{cleanVietnamese(profile.bio)}</p>
             </div>
 
             {/* Key Skills */}
@@ -168,7 +176,7 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
                       key={skill}
                       className="bg-white/10 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/10"
                     >
-                      {skill.normalize("NFC")}
+                      {cleanVietnamese(skill)}
                     </span>
                   ))}
                 </div>
@@ -188,13 +196,13 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
                       key={proj.id}
                       className="p-3 border border-white/10 rounded-xl bg-white/5 hover:bg-white/10 transition-all space-y-1"
                     >
-                      <h4 className="text-xs font-bold text-white">{proj.title}</h4>
-                      <p className="text-[11px] text-gray-400 line-clamp-2 leading-relaxed">
-                        {proj.description}
+                      <h4 className="text-xs font-bold text-white">{cleanVietnamese(proj.title)}</h4>
+                      <p className="text-[11px] text-gray-400 leading-relaxed text-justify">
+                        {cleanVietnamese(proj.description)}
                       </p>
                       {proj.outcome && (
                         <span className="inline-block text-[10px] text-secondary-container font-medium mt-1">
-                          Result: {proj.outcome}
+                          Result: {cleanVietnamese(proj.outcome)}
                         </span>
                       )}
                     </div>

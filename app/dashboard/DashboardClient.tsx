@@ -580,6 +580,33 @@ export function DashboardClient({
     setActiveTab("dashboard");
   };
 
+  const handlePublishScenario = async (scenario: "A" | "B") => {
+    if (!currentResult) return;
+    const found = savedPitches.find(
+      (p) =>
+        p.pitch.scenarioA.title === currentResult.scenarioA.title &&
+        p.pitch.scenarioA.content === currentResult.scenarioA.content
+    );
+
+    if (found) {
+      window.open(`/pitch/${found.id}?scenario=${scenario}`, "_blank");
+    } else {
+      setLoading(true);
+      try {
+        const res = await generatePitchAction({ ...inputs, lang });
+        if (res.error || !res.data) {
+          throw new Error(res.error ?? "Failed to save pitch.");
+        }
+        setSavedPitches((prev) => [res.data!, ...prev]);
+        window.open(`/pitch/${res.data.id}?scenario=${scenario}`, "_blank");
+      } catch (err: any) {
+        showNotification(err.message || "Failed to publish scenario.", "info");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
     setCopiedScenario(id);
@@ -1199,6 +1226,7 @@ export function DashboardClient({
                   handlePdfUpload={handlePdfUpload}
                   parsingPdf={parsingPdf}
                   lang={lang}
+                  handlePublishScenario={handlePublishScenario}
                 />
               )}
 

@@ -157,10 +157,21 @@ export function DashboardClient({
   // Master Profiles management states
   const [profiles, setProfiles] = useState<MasterProfile[]>(initialProfiles);
 
-  const handleCreateProfile = async () => {
-    const name = prompt("Enter a name for your new Master Profile (e.g. 'Consulting Focus', 'Web Dev Focus'):");
-    if (!name || !name.trim()) return;
+  // ── New Profile Modal state ──────────────────────────────────────────────
+  const [showNewProfileModal, setShowNewProfileModal] = useState(false);
+  const [newProfileName, setNewProfileName] = useState("");
+  const [creatingProfile, setCreatingProfile] = useState(false);
 
+  const handleCreateProfile = () => {
+    setNewProfileName("");
+    setShowNewProfileModal(true);
+  };
+
+  const handleConfirmCreateProfile = async () => {
+    const name = newProfileName.trim();
+    if (!name) return;
+
+    setCreatingProfile(true);
     setLoading(true);
     try {
       const res = await createProfileAction(name);
@@ -170,12 +181,13 @@ export function DashboardClient({
 
       setProfiles((prev) => [...prev, res.data!]);
       showNotification(`Created profile: "${name}"`, "success");
-      // Auto select the new profile
       handleSelectProfile(res.data.id!);
     } catch (err: any) {
       showNotification(err.message || "Failed to create profile.", "info");
     } finally {
+      setCreatingProfile(false);
       setLoading(false);
+      setShowNewProfileModal(false);
     }
   };
 
@@ -611,6 +623,103 @@ export function DashboardClient({
                 className="h-full bg-current"
               />
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── New Profile Modal ── */}
+      <AnimatePresence>
+        {showNewProfileModal && (
+          <motion.div
+            key="new-profile-modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
+            onClick={(e) => { if (e.target === e.currentTarget) setShowNewProfileModal(false); }}
+          >
+            <motion.div
+              key="new-profile-modal"
+              initial={{ opacity: 0, scale: 0.92, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 16 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-surface-container-lowest border border-outline-variant rounded-2xl shadow-2xl w-full max-w-md p-6"
+            >
+              {/* Modal Header */}
+              <div className="flex items-start justify-between mb-5">
+                <div>
+                  <h3 className="text-base font-bold text-primary font-geist">
+                    {lang === "vi" ? "Tạo hồ sơ mới" : "Create New Profile"}
+                  </h3>
+                  <p className="text-xs text-on-surface-variant mt-1">
+                    {lang === "vi"
+                      ? "Mỗi hồ sơ có thể có bộ kỹ năng và dự án riêng biệt."
+                      : "Each profile can have its own skills and projects for different contexts."}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowNewProfileModal(false)}
+                  className="text-on-surface-variant hover:text-error transition-colors cursor-pointer p-1 rounded-lg hover:bg-surface-container-low"
+                >
+                  <AlertCircle className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Input */}
+              <div className="mb-5">
+                <label className="block text-xs font-bold text-primary uppercase tracking-wider mb-1.5">
+                  {lang === "vi" ? "Tên hồ sơ" : "Profile Name"}
+                </label>
+                <input
+                  type="text"
+                  value={newProfileName}
+                  onChange={(e) => setNewProfileName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleConfirmCreateProfile(); if (e.key === "Escape") setShowNewProfileModal(false); }}
+                  autoFocus
+                  className="w-full bg-surface-container-low border border-outline-variant rounded-xl p-3 text-sm text-primary focus:border-secondary focus:ring-2 focus:ring-secondary/15 outline-none transition-all"
+                  placeholder={lang === "vi" ? "VD: Tập trung Freelance, Phỏng vấn Tech..." : "e.g. Consulting Focus, Web Dev Focus..."}
+                  maxLength={60}
+                />
+                <p className="text-[10px] text-on-surface-variant mt-1 text-right">{newProfileName.length}/60</p>
+              </div>
+
+              {/* Examples */}
+              <div className="flex flex-wrap gap-1.5 mb-5">
+                {["Freelance Dev", "Job Interview", "Enterprise Sales", "Startup Pitch"].map((ex) => (
+                  <button
+                    key={ex}
+                    type="button"
+                    onClick={() => setNewProfileName(ex)}
+                    className="text-[10px] px-2.5 py-1 bg-surface border border-outline-variant rounded-full text-on-surface-variant hover:border-secondary hover:text-secondary transition-all cursor-pointer font-semibold"
+                  >
+                    {ex}
+                  </button>
+                ))}
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowNewProfileModal(false)}
+                  className="flex-1 px-4 py-2.5 border border-outline text-primary rounded-xl text-sm font-semibold hover:bg-surface-container-low transition-colors cursor-pointer"
+                >
+                  {lang === "vi" ? "Hủy" : "Cancel"}
+                </button>
+                <button
+                  onClick={handleConfirmCreateProfile}
+                  disabled={!newProfileName.trim() || creatingProfile}
+                  className="flex-1 px-4 py-2.5 bg-primary-container text-on-primary rounded-xl text-sm font-bold hover:bg-primary-container/90 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {creatingProfile ? (
+                    <><div className="w-3.5 h-3.5 border-2 border-on-primary/40 border-t-on-primary rounded-full animate-spin" />{lang === "vi" ? "Đang tạo..." : "Creating..."}</>
+                  ) : (
+                    <>{lang === "vi" ? "✓ Tạo hồ sơ" : "✓ Create Profile"}</>
+                  )}
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

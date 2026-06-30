@@ -157,7 +157,28 @@ export function DashboardClient({
   // Master Profiles management states
   const [profiles, setProfiles] = useState<MasterProfile[]>(initialProfiles);
 
-  // ── New Profile Modal state ──────────────────────────────────────────────
+  // ── Reset Confirmation Modal state ───────────────────────────────────
+  const [showResetModal, setShowResetModal] = useState(false);
+
+  const handleConfirmReset = async () => {
+    const defaults: MasterProfile = {
+      fullName: "Jane Doe",
+      jobTitle: "Lead Strategic Designer",
+      bio: "Helping companies translate complex, multi-sided user needs into elegant, high-velocity digital products...",
+      skills: ["UI/UX Design", "Product Strategy", "Data Visualization", "User Research"],
+      projects: [
+        { id: "1", title: "Project Alpha", description: "Redesign of enterprise dashboard, increasing day-to-day workflow efficiency by 40%.", image: MOCK_IMAGES[0] },
+        { id: "2", title: "FinTech Pivot", description: "Led cross-functional product design team to launch a next-generation asset trading application.", image: MOCK_IMAGES[1] },
+      ],
+    };
+    setProfileState(defaults);
+    setSavedPitches([]);
+    setCurrentResult(INITIAL_RESULT);
+    setInputs(INITIAL_INPUTS);
+    setShowResetModal(false);
+    showNotification(lang === "vi" ? "Đã đặt lại ứng dụng về mặc định!" : "Application state has been reset!", "success");
+    await syncProfileToServer(defaults);
+  };
   const [showNewProfileModal, setShowNewProfileModal] = useState(false);
   const [newProfileName, setNewProfileName] = useState("");
   const [creatingProfile, setCreatingProfile] = useState(false);
@@ -627,7 +648,75 @@ export function DashboardClient({
         )}
       </AnimatePresence>
 
-      {/* ── New Profile Modal ── */}
+      {/* ── Reset Confirmation Modal ── */}
+      <AnimatePresence>
+        {showResetModal && (
+          <motion.div
+            key="reset-modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+            onClick={(e) => { if (e.target === e.currentTarget) setShowResetModal(false); }}
+          >
+            <motion.div
+              key="reset-modal"
+              initial={{ opacity: 0, scale: 0.92, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 16 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-surface-container-lowest border border-outline-variant rounded-2xl shadow-2xl w-full max-w-md p-6"
+            >
+              {/* Icon + Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-error/10 border border-error/20 flex items-center justify-center shrink-0">
+                  <AlertCircle className="w-5 h-5 text-error" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-primary font-geist">
+                    {lang === "vi" ? "Đặt lại ứng dụng?" : "Reset Application?"}
+                  </h3>
+                  <p className="text-xs text-on-surface-variant">
+                    {lang === "vi" ? "Thao tác này không thể hoàn tác." : "This action cannot be undone."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Warning list */}
+              <div className="bg-error/5 border border-error/15 rounded-xl p-4 mb-5 space-y-2">
+                {[
+                  lang === "vi" ? "Đặt lại toàn bộ thông tin hồ sơ về mặc định" : "Reset all profile info to placeholder defaults",
+                  lang === "vi" ? "Xóa toàn bộ lịch sử Pitch đã lưu" : "Permanently delete all saved pitch history",
+                  lang === "vi" ? "Đặt lại kết quả pitch hiện tại" : "Clear current pitch results",
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-2 text-xs text-error/80">
+                    <span className="font-bold mt-0.5 shrink-0">•</span>
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowResetModal(false)}
+                  className="flex-1 px-4 py-2.5 border border-outline text-primary rounded-xl text-sm font-semibold hover:bg-surface-container-low transition-colors cursor-pointer"
+                >
+                  {lang === "vi" ? "Hủy bỏ" : "Cancel"}
+                </button>
+                <button
+                  onClick={handleConfirmReset}
+                  className="flex-1 px-4 py-2.5 bg-error text-on-error rounded-xl text-sm font-bold hover:bg-error/90 transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  {lang === "vi" ? "Đặt lại ngay" : "Yes, Reset"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {showNewProfileModal && (
           <motion.div
@@ -1176,45 +1265,7 @@ export function DashboardClient({
                 <SettingsView
                   hasApiKey={hasApiKey}
                   lang={lang}
-                  handleResetState={async () => {
-                    if (
-                      confirm(lang === "vi" ? "Bạn có chắc muốn đặt lại tất cả về mặc định không?" : "Are you sure you want to reset everything back to defaults?")
-                    ) {
-                      const defaults: MasterProfile = {
-                        fullName: "Jane Doe",
-                        jobTitle: "Lead Strategic Designer",
-                        bio: "Helping companies translate complex, multi-sided user needs into elegant, high-velocity digital products...",
-                        skills: [
-                          "UI/UX Design",
-                          "Product Strategy",
-                          "Data Visualization",
-                          "User Research",
-                        ],
-                        projects: [
-                          {
-                            id: "1",
-                            title: "Project Alpha",
-                            description:
-                              "Redesign of enterprise dashboard, increasing day-to-day workflow efficiency by 40%.",
-                            image: MOCK_IMAGES[0],
-                          },
-                          {
-                            id: "2",
-                            title: "FinTech Pivot",
-                            description:
-                              "Led cross-functional product design team to launch a next-generation asset trading application.",
-                            image: MOCK_IMAGES[1],
-                          },
-                        ],
-                      };
-                      setProfileState(defaults);
-                      setSavedPitches([]);
-                      setCurrentResult(INITIAL_RESULT);
-                      setInputs(INITIAL_INPUTS);
-                      showNotification("Application state has been reset!");
-                      await syncProfileToServer(defaults);
-                    }
-                  }}
+                  handleResetState={() => setShowResetModal(true)}
                 />
               )}
 

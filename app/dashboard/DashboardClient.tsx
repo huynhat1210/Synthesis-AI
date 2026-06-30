@@ -31,6 +31,7 @@ import {
   Info,
   Check,
   X,
+  MessageSquare,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { UserButton } from "@clerk/nextjs";
@@ -53,6 +54,7 @@ import { PitchesView } from "@/components/dashboard/PitchesView";
 import { AnalyticsView } from "@/components/dashboard/AnalyticsView";
 import { SettingsView } from "@/components/dashboard/SettingsView";
 import { HelpView } from "@/components/dashboard/HelpView";
+import { ChatView } from "@/components/dashboard/ChatView";
 
 import type {
   SavedPitch,
@@ -196,7 +198,7 @@ export function DashboardClient({
 
   // Navigation active tab
   const [activeTab, setActiveTab] = useState<
-    "dashboard" | "profile" | "projects" | "pitches" | "analytics" | "settings" | "help"
+    "dashboard" | "profile" | "projects" | "pitches" | "analytics" | "settings" | "help" | "chat"
   >("dashboard");
 
   // Shared Master Profile & Pitching states
@@ -1253,6 +1255,21 @@ export function DashboardClient({
           </li>
           <li>
             <button
+              onClick={() => changeTab("chat")}
+              className={cn(
+                "w-full flex items-center gap-3 px-4 py-3 rounded-lg font-semibold transition-all text-left relative",
+                activeTab === "chat"
+                  ? "bg-surface-container-high text-primary border-r-4 border-secondary"
+                  : "text-on-surface-variant hover:bg-surface-container-low"
+              )}
+            >
+              <MessageSquare className="w-5 h-5 text-primary" />
+              <span className="text-sm">{lang === "vi" ? "Tư vấn AI" : "AI Advisor"}</span>
+              <span className="ml-auto text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-secondary/15 text-secondary tracking-wider">NEW</span>
+            </button>
+          </li>
+          <li>
+            <button
               onClick={() => changeTab("help")}
               className={cn(
                 "w-full flex items-center gap-3 px-4 py-3 rounded-lg font-semibold transition-all text-left",
@@ -1569,6 +1586,10 @@ export function DashboardClient({
               )}
 
               {activeTab === "help" && <HelpView lang={lang} />}
+
+              {activeTab === "chat" && (
+                <ChatView profile={profile} lang={lang} />
+              )}
             </motion.div>
           </AnimatePresence>
         </main>

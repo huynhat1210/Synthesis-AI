@@ -15,15 +15,12 @@ import { translations, type Language } from "@/lib/translations";
 import { suggestSkillsAction } from "@/actions/suggestSkills";
 import { PROFILE_TEMPLATES } from "@/lib/templates";
 
-/**
- * Normalizes Vietnamese text and removes double spaces and odd LLM accent gaps.
- */
 function cleanVietnamese(text: string): string {
   if (!text) return "";
   return text
     .normalize("NFC")
     .replace(/\s+/g, " ")
-    .replace(/([áàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹ])\s+([cmnptuyo]|ng|nh|ch)\b/gi, "$1$2")
+    .replace(/([áàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹ])\s+([cmnptuyo]|ng|nh|ch)(?=\s|$)/gi, "$1$2")
     .trim();
 }
 

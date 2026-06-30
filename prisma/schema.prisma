@@ -55,3 +55,19 @@ model SavedPitch {
   profileId   String        @default("default")
   profile     MasterProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
+
+model ChatSession {
+  id        String        @id @default(uuid())
+  userId    String        @unique
+  messages  ChatMessage[]
+  updatedAt DateTime      @updatedAt
+}
+
+model ChatMessage {
+  id        String      @id @default(uuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String      // "user" | "assistant"
+  content   String
+  createdAt DateTime    @default(now())
+}

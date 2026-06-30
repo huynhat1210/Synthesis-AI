@@ -1,19 +1,70 @@
 /**
  * @file actions/chat.ts
- * @description Server Action: AI Career Advisor chatbot powered by Gemini,
- *              deeply context-aware of the user's Master Profile.
+ * @description Server Actions for the AI Career Advisor chatbot.
+ *              - sendChatMessageAction: Sends a message to Gemini and saves the Q&A to PostgreSQL.
+ *              - loadChatHistoryAction: Loads the user's full chat history from PostgreSQL.
+ *              - clearChatHistoryAction: Deletes all messages in the user's chat session.
  */
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenAI } from "@google/genai";
 import { readProfile } from "@/lib/storage";
+import { prisma } from "@/lib/prisma";
 import type { ApiResponse } from "@/types";
 
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
 }
+
+// ── Load chat history from PostgreSQL ────────────────────────────────────────
+
+export async function loadChatHistoryAction(): Promise<ApiResponse<ChatMessage[]>> {
+  const { userId } = await auth();
+  if (!userId) return { data: null, error: "Unauthorized." };
+
+  try {
+    const session = await prisma.chatSession.findUnique({
+      where: { userId },
+      include: {
+        messages: { orderBy: { createdAt: "asc" } },
+      },
+    });
+
+    if (!session) return { data: [], error: null };
+
+    return {
+      data: session.messages.map((m) => ({
+        role: m.role as "user" | "assistant",
+        content: m.content,
+      })),
+      error: null,
+    };
+  } catch (err: any) {
+    console.error("[Chat] loadChatHistoryAction error:", err);
+    return { data: [], error: null }; // Fail gracefully
+  }
+}
+
+// ── Clear chat history ────────────────────────────────────────────────────────
+
+export async function clearChatHistoryAction(): Promise<ApiResponse<null>> {
+  const { userId } = await auth();
+  if (!userId) return { data: null, error: "Unauthorized." };
+
+  try {
+    const session = await prisma.chatSession.findUnique({ where: { userId } });
+    if (session) {
+      await prisma.chatMessage.deleteMany({ where: { sessionId: session.id } });
+    }
+    return { data: null, error: null };
+  } catch (err: any) {
+    return { data: null, error: err.message };
+  }
+}
+
+// ── Send message to Gemini + save to DB ──────────────────────────────────────
 
 export async function sendChatMessageAction(
   messages: ChatMessage[],
@@ -23,9 +74,7 @@ export async function sendChatMessageAction(
   if (!userId) return { data: null, error: "Unauthorized." };
 
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return { data: null, error: "Gemini API key is not configured." };
-  }
+  if (!apiKey) return { data: null, error: "Gemini API key is not configured." };
 
   // Load user profile for context-aware advice
   const profile = await readProfile(userId);
@@ -71,24 +120,21 @@ You are NOT a general chatbot — you are a specialized career intelligence advi
   try {
     const client = new GoogleGenAI({ apiKey });
 
-    // Build conversation contents for multi-turn chat
     const contents = [
-      // Inject system context as first user turn (SDK v1 pattern)
       { role: "user", parts: [{ text: systemPrompt }] },
       {
         role: "model",
         parts: [
           {
-            text: "Understood. I am your personalized AI Career Advisor with full access to your professional profile. I am ready to provide tailored career guidance, pitch optimization advice, and skill gap analysis. How can I help you today?",
+            text: "Understood. I am your personalized AI Career Advisor. Ready to provide tailored career guidance.",
           },
         ],
       },
-      // Previous conversation history (last 10 turns)
-      ...messages.slice(-10).map((m) => ({
+      // Previous conversation context (last 12 turns)
+      ...messages.slice(-12).map((m) => ({
         role: m.role === "assistant" ? "model" : "user",
         parts: [{ text: m.content }],
       })),
-      // Current user message
       { role: "user", parts: [{ text: userMessage }] },
     ];
 
@@ -97,10 +143,30 @@ You are NOT a general chatbot — you are a specialized career intelligence advi
       contents,
     });
 
-    const response = result.text ?? "";
-    return { data: response, error: null };
+    const responseText = result.text ?? "";
+
+    // ── Persist both user message and AI response to PostgreSQL ──────────────
+    try {
+      const session = await prisma.chatSession.upsert({
+        where: { userId },
+        update: {},
+        create: { userId },
+      });
+
+      await prisma.chatMessage.createMany({
+        data: [
+          { sessionId: session.id, role: "user", content: userMessage },
+          { sessionId: session.id, role: "assistant", content: responseText },
+        ],
+      });
+    } catch (dbErr) {
+      // Non-fatal: DB save failure should not break the chat response
+      console.error("[Chat] Failed to persist messages:", dbErr);
+    }
+
+    return { data: responseText, error: null };
   } catch (err: any) {
-    console.error("[AI Chat] Error:", err);
+    console.error("[AI Chat] Gemini error:", err);
     return { data: null, error: err.message || "Failed to get AI response." };
   }
 }

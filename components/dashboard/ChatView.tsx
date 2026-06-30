@@ -1,14 +1,19 @@
 /**
  * @file components/dashboard/ChatView.tsx
- * @description AI Career Advisor — a full-featured chat interface powered by Gemini,
- *              deeply aware of the user's Master Profile for personalized career advice.
+ * @description AI Career Advisor — full-featured chat interface powered by Gemini.
+ *              Conversations are persisted to PostgreSQL and restored on mount.
  */
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Sparkles, Send, RefreshCw, User, Bot, Lightbulb, ChevronDown } from "lucide-react";
-import { sendChatMessageAction, type ChatMessage } from "@/actions/chat";
+import {
+  sendChatMessageAction,
+  loadChatHistoryAction,
+  clearChatHistoryAction,
+  type ChatMessage,
+} from "@/actions/chat";
 import type { MasterProfile } from "@/types";
 import { type Language } from "@/lib/translations";
 
@@ -36,42 +41,48 @@ const STARTER_PROMPTS_EN = [
 function TypingIndicator() {
   return (
     <div className="flex items-end gap-2.5">
-      <div className="w-7 h-7 rounded-full bg-secondary/10 border border-secondary/20 flex items-center justify-center shrink-0">
+      <div className="w-7 h-7 rounded-full bg-surface-container border border-outline-variant flex items-center justify-center shrink-0">
         <Bot className="w-4 h-4 text-secondary" />
       </div>
-      <div className="bg-surface-container-low border border-outline-variant rounded-2xl rounded-bl-sm px-4 py-3 max-w-xs">
+      <div className="bg-surface-container border border-outline-variant rounded-2xl rounded-bl-sm px-4 py-3 max-w-xs">
         <div className="flex gap-1.5 items-center h-4">
-          <span className="w-2 h-2 rounded-full bg-secondary/60 animate-bounce" style={{ animationDelay: "0ms" }} />
-          <span className="w-2 h-2 rounded-full bg-secondary/60 animate-bounce" style={{ animationDelay: "150ms" }} />
-          <span className="w-2 h-2 rounded-full bg-secondary/60 animate-bounce" style={{ animationDelay: "300ms" }} />
+          <span className="w-2 h-2 rounded-full bg-secondary/50 animate-bounce" style={{ animationDelay: "0ms" }} />
+          <span className="w-2 h-2 rounded-full bg-secondary/50 animate-bounce" style={{ animationDelay: "150ms" }} />
+          <span className="w-2 h-2 rounded-full bg-secondary/50 animate-bounce" style={{ animationDelay: "300ms" }} />
         </div>
       </div>
     </div>
   );
 }
 
-function MessageBubble({ msg, isLast }: { msg: ChatMessage; isLast: boolean }) {
+function MessageBubble({ msg }: { msg: ChatMessage }) {
   const isUser = msg.role === "user";
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
       className={`flex items-end gap-2.5 ${isUser ? "flex-row-reverse" : "flex-row"}`}
     >
       {/* Avatar */}
-      <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isUser ? "bg-primary-container border border-primary/20" : "bg-secondary/10 border border-secondary/20"}`}>
-        {isUser
-          ? <User className="w-4 h-4 text-primary" />
-          : <Bot className="w-4 h-4 text-secondary" />
-        }
+      <div
+        className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
+          isUser
+            ? "bg-secondary text-on-secondary"
+            : "bg-surface-container border border-outline-variant"
+        }`}
+      >
+        {isUser ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5 text-secondary" />}
       </div>
+
       {/* Bubble */}
-      <div className={`max-w-[78%] px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap rounded-2xl ${
-        isUser
-          ? "bg-primary-container text-primary rounded-br-sm"
-          : "bg-surface-container-low border border-outline-variant text-on-surface rounded-bl-sm"
-      }`}>
+      <div
+        className={`max-w-[78%] px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap rounded-2xl ${
+          isUser
+            ? "bg-secondary/15 text-primary border border-secondary/20 rounded-br-sm"
+            : "bg-surface-container border border-outline-variant text-on-surface rounded-bl-sm"
+        }`}
+      >
         {msg.content}
       </div>
     </motion.div>
@@ -82,6 +93,7 @@ export function ChatView({ profile, lang }: ChatViewProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(true);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -89,18 +101,32 @@ export function ChatView({ profile, lang }: ChatViewProps) {
 
   const starterPrompts = lang === "vi" ? STARTER_PROMPTS_VI : STARTER_PROMPTS_EN;
 
+  // Load chat history from DB on mount
+  useEffect(() => {
+    (async () => {
+      setHistoryLoading(true);
+      const res = await loadChatHistoryAction();
+      if (res.data) setMessages(res.data);
+      setHistoryLoading(false);
+    })();
+  }, []);
+
   const scrollToBottom = (smooth = true) => {
     bottomRef.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
   };
 
   useEffect(() => {
-    scrollToBottom();
+    if (!historyLoading) scrollToBottom(false);
+  }, [historyLoading]);
+
+  useEffect(() => {
+    if (messages.length > 0) scrollToBottom();
   }, [messages, loading]);
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-    setShowScrollBtn(scrollHeight - scrollTop - clientHeight > 100);
+    setShowScrollBtn(scrollHeight - scrollTop - clientHeight > 120);
   };
 
   const sendMessage = async (text: string) => {
@@ -110,6 +136,12 @@ export function ChatView({ profile, lang }: ChatViewProps) {
     setMessages(newMessages);
     setInput("");
     setLoading(true);
+
+    // Reset textarea height
+    if (inputRef.current) {
+      inputRef.current.style.height = "auto";
+    }
+
     try {
       const res = await sendChatMessageAction(messages, text.trim());
       if (res.data) {
@@ -117,14 +149,14 @@ export function ChatView({ profile, lang }: ChatViewProps) {
       } else {
         setMessages([
           ...newMessages,
-          { role: "assistant", content: `⚠️ ${res.error || (lang === "vi" ? "Đã xảy ra lỗi. Vui lòng thử lại." : "An error occurred. Please try again.")}` },
+          {
+            role: "assistant",
+            content: `⚠️ ${res.error || (lang === "vi" ? "Đã xảy ra lỗi. Vui lòng thử lại." : "An error occurred. Please try again.")}`,
+          },
         ]);
       }
     } catch (err: any) {
-      setMessages([
-        ...newMessages,
-        { role: "assistant", content: `⚠️ ${err.message || "Error."}` },
-      ]);
+      setMessages([...newMessages, { role: "assistant", content: `⚠️ ${err.message || "Error."}` }]);
     } finally {
       setLoading(false);
       setTimeout(() => inputRef.current?.focus(), 100);
@@ -138,9 +170,10 @@ export function ChatView({ profile, lang }: ChatViewProps) {
     }
   };
 
-  const clearChat = () => {
+  const clearChat = async () => {
     setMessages([]);
     setInput("");
+    await clearChatHistoryAction();
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
@@ -154,12 +187,12 @@ export function ChatView({ profile, lang }: ChatViewProps) {
           </div>
           <div>
             <h3 className="text-sm font-bold text-primary font-geist uppercase tracking-wider">
-              {lang === "vi" ? "AI Career Advisor" : "AI Career Advisor"}
+              AI Career Advisor
             </h3>
             <p className="text-[10px] text-on-surface-variant font-semibold">
               {lang === "vi"
-                ? `Tư vấn cá nhân hóa cho ${profile.fullName || "bạn"} · Gemini 2.5 Flash`
-                : `Personalized advisor for ${profile.fullName || "you"} · Gemini 2.5 Flash`}
+                ? `Tư vấn cá nhân hóa cho ${profile.fullName?.split(" ")[0] || "bạn"} · Gemini 2.5 Flash`
+                : `Personalized advisor for ${profile.fullName?.split(" ")[0] || "you"} · Gemini 2.5 Flash`}
             </p>
           </div>
         </div>
@@ -168,7 +201,7 @@ export function ChatView({ profile, lang }: ChatViewProps) {
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             {lang === "vi" ? "Đang hoạt động" : "Online"}
           </span>
-          {messages.length > 0 && (
+          {messages.length > 0 && !loading && (
             <button
               onClick={clearChat}
               className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/5 rounded-lg transition-colors cursor-pointer"
@@ -186,8 +219,12 @@ export function ChatView({ profile, lang }: ChatViewProps) {
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-4 scroll-smooth"
       >
-        {messages.length === 0 ? (
-          /* Welcome State */
+        {historyLoading ? (
+          <div className="h-full flex items-center justify-center">
+            <RefreshCw className="w-5 h-5 text-secondary animate-spin" />
+          </div>
+        ) : messages.length === 0 ? (
+          /* Welcome / Empty state */
           <div className="h-full flex flex-col items-center justify-center text-center gap-5 py-8">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
@@ -199,12 +236,14 @@ export function ChatView({ profile, lang }: ChatViewProps) {
             </motion.div>
             <div>
               <h4 className="text-base font-bold text-primary font-geist mb-1">
-                {lang === "vi" ? `Xin chào, ${profile.fullName?.split(" ")[0] || "bạn"}! 👋` : `Hello, ${profile.fullName?.split(" ")[0] || "there"}! 👋`}
+                {lang === "vi"
+                  ? `Xin chào, ${profile.fullName?.split(" ")[0] || "bạn"}! 👋`
+                  : `Hello, ${profile.fullName?.split(" ")[0] || "there"}! 👋`}
               </h4>
               <p className="text-xs text-on-surface-variant max-w-xs leading-relaxed">
                 {lang === "vi"
-                  ? "Tôi là cố vấn nghề nghiệp AI của bạn, đã đọc qua toàn bộ hồ sơ và lịch sử Pitch của bạn. Hãy hỏi tôi bất cứ điều gì về sự nghiệp của bạn!"
-                  : "I am your AI career advisor — I have already read through your full profile and pitch history. Ask me anything about your career!"}
+                  ? "Tôi là cố vấn nghề nghiệp AI của bạn, đã đọc qua toàn bộ hồ sơ của bạn. Hãy hỏi tôi bất cứ điều gì!"
+                  : "I am your AI career advisor — I have already read your full profile. Ask me anything!"}
               </p>
             </div>
 
@@ -233,7 +272,7 @@ export function ChatView({ profile, lang }: ChatViewProps) {
         ) : (
           <>
             {messages.map((msg, i) => (
-              <MessageBubble key={i} msg={msg} isLast={i === messages.length - 1} />
+              <MessageBubble key={i} msg={msg} />
             ))}
             {loading && <TypingIndicator />}
           </>
@@ -270,7 +309,7 @@ export function ChatView({ profile, lang }: ChatViewProps) {
                 ? "Nhập câu hỏi của bạn... (Enter để gửi, Shift+Enter để xuống dòng)"
                 : "Type your question... (Enter to send, Shift+Enter for new line)"
             }
-            disabled={loading}
+            disabled={loading || historyLoading}
             className="flex-1 resize-none bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm text-primary placeholder:text-on-surface-variant outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/10 transition-all leading-relaxed max-h-32 overflow-y-auto disabled:opacity-60"
             style={{ minHeight: "46px" }}
             onInput={(e) => {
@@ -281,19 +320,16 @@ export function ChatView({ profile, lang }: ChatViewProps) {
           />
           <button
             onClick={() => sendMessage(input)}
-            disabled={!input.trim() || loading}
+            disabled={!input.trim() || loading || historyLoading}
             className="w-11 h-11 rounded-xl bg-secondary text-on-secondary flex items-center justify-center shrink-0 hover:bg-secondary/90 active:scale-95 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-sm shadow-secondary/20"
           >
-            {loading
-              ? <RefreshCw className="w-4 h-4 animate-spin" />
-              : <Send className="w-4 h-4" />
-            }
+            {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </button>
         </div>
         <p className="text-[10px] text-on-surface-variant text-center mt-2 opacity-60">
           {lang === "vi"
-            ? "AI có thể mắc lỗi. Hãy xác minh các gợi ý quan trọng."
-            : "AI can make mistakes. Please verify critical suggestions."}
+            ? "Lịch sử trò chuyện được lưu tự động · AI có thể mắc lỗi."
+            : "Conversation history is saved automatically · AI can make mistakes."}
         </p>
       </div>
     </div>

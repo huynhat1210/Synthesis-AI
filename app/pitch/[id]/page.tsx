@@ -40,8 +40,13 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
       <div className="max-w-6xl mx-auto px-6 py-12 lg:py-20 relative z-10">
         {/* Top Header */}
         <header className="flex justify-between items-center mb-16 border-b border-white/10 pb-6">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-85 transition-opacity cursor-pointer">
-            <Sparkles className="w-6 h-6 text-secondary-container" />
+          <Link href="/" className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/favicon.png"
+              alt="Synthesis AI Logo"
+              className="w-6 h-6 rounded object-contain bg-white/5 p-0.5 border border-white/10"
+            />
             <span className="text-sm font-bold font-geist tracking-wider uppercase text-gray-300">
               Synthesis Portal
             </span>

@@ -1,25 +1,36 @@
 /**
  * @file app/page.tsx
  * @description Premium product landing page for PitchPerfect.
- *              Directs to dashboard when authenticated, or prompts login.
+ *              Contains interactive video demo player, favicon logo, and clerk auth check.
  */
-import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
-import { ArrowRight, Sparkles, Sliders, TrendingUp, CheckCircle, ShieldCheck, Mail } from "lucide-react";
+"use client";
 
-export default async function RootPage() {
-  const { userId } = await auth();
+import { useState } from "react";
+import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
+import { ArrowRight, Sparkles, Sliders, TrendingUp, CheckCircle, Play, X } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+
+export default function RootPage() {
+  const { userId } = useAuth();
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
   const dashboardLink = userId ? "/dashboard" : "/dashboard"; // clerk will redirect to login if not authenticated
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-teal-500 selection:text-white font-sans antialiased">
       {/* ── HEADER ──────────────────────────────────────────────────────── */}
       <header className="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-100 z-50 py-4 px-6 md:px-12 flex justify-between items-center transition-all">
-        <div className="flex items-center gap-2">
-          <span className="font-extrabold text-xl tracking-tight text-slate-800 hover:opacity-90 transition-opacity">
+        <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/favicon.png"
+            alt="PitchPerfect Logo"
+            className="w-8 h-8 rounded-lg object-contain bg-slate-100 p-0.5 border border-slate-200/60"
+          />
+          <span className="font-extrabold text-xl tracking-tight text-slate-800">
             PitchPerfect
           </span>
-        </div>
+        </Link>
 
         <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
           <a href="#features" className="hover:text-teal-600 transition-colors">Features</a>
@@ -55,21 +66,30 @@ export default async function RootPage() {
             <span>{userId ? "Vào Dashboard" : "Bắt đầu ngay"}</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
-          <a
-            href="#demo"
-            className="inline-flex items-center justify-center border border-teal-800 text-teal-800 hover:bg-teal-50 font-semibold px-8 py-3.5 rounded-full transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          <button
+            onClick={() => setIsVideoOpen(true)}
+            className="inline-flex items-center justify-center border border-teal-800 text-teal-800 hover:bg-teal-50 font-semibold px-8 py-3.5 rounded-full transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer gap-2"
           >
-            View Demo
-          </a>
+            <Play className="w-4 h-4 fill-current shrink-0" />
+            <span>View Demo</span>
+          </button>
         </div>
 
         {/* ── MOCKUP ──────────────────────────────────────────────────────── */}
-        <div id="demo" className="w-full max-w-5xl rounded-2xl overflow-hidden border border-slate-200/80 shadow-2xl bg-white p-2">
+        <div 
+          onClick={() => setIsVideoOpen(true)}
+          className="w-full max-w-5xl rounded-2xl overflow-hidden border border-slate-200/80 shadow-2xl bg-white p-2 cursor-pointer group relative"
+        >
+          <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-slate-900/20 z-10 transition-colors flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-teal-800/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-all duration-300">
+              <Play className="w-6 h-6 fill-current translate-x-0.5" />
+            </div>
+          </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/dashboard_mockup.png"
             alt="Synthesis AI Dashboard Mockup"
-            className="w-full h-auto rounded-xl object-cover"
+            className="w-full h-auto rounded-xl object-cover group-hover:scale-[1.005] transition-all duration-500"
           />
         </div>
       </section>
@@ -245,7 +265,15 @@ export default async function RootPage() {
       <footer className="bg-white border-t border-slate-100 py-12 px-6 md:px-12 mt-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-col items-center md:items-start gap-2">
-            <span className="font-extrabold text-lg text-slate-800">PitchPerfect</span>
+            <div className="flex items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/favicon.png"
+                alt="PitchPerfect Logo"
+                className="w-6 h-6 rounded object-contain bg-slate-100 p-0.5 border border-slate-200/60"
+              />
+              <span className="font-extrabold text-base text-slate-800">PitchPerfect</span>
+            </div>
             <p className="text-xs text-slate-400">© 2026 PitchPerfect by Synthesis AI. All rights reserved.</p>
           </div>
           <div className="flex gap-8 text-xs text-slate-500 font-semibold">
@@ -255,6 +283,43 @@ export default async function RootPage() {
           </div>
         </div>
       </footer>
+
+      {/* ── VIDEO MODAL ────────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {isVideoOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-slate-900/85 backdrop-blur-md flex items-center justify-center p-4 md:p-6"
+            onClick={() => setIsVideoOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-black rounded-2xl overflow-hidden shadow-2xl border border-slate-800 max-w-4xl w-full aspect-video relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setIsVideoOpen(false)}
+                className="absolute top-4 right-4 z-10 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full border border-white/10 transition-all active:scale-90"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              
+              <video
+                src="https://player.vimeo.com/external/435674703.sd.mp4?s=7f41a12a1f07f4d2f83f5e5b38a7c2be6d4e5f0d&profile_id=139&oauth2_token_id=57447761"
+                className="w-full h-full object-cover"
+                controls
+                autoPlay
+                loop
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

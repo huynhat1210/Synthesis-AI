@@ -189,6 +189,8 @@ export function DashboardClient({
     message: string;
     type: "success" | "info" | "error";
   } | null>(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(true);
   const [copiedScenario, setCopiedScenario] = useState<string | null>(null);
 
   // Skill editing states
@@ -561,7 +563,13 @@ export function DashboardClient({
       {/* SideNavBar */}
       <nav className="hidden md:flex w-[280px] h-screen flex-col border-r border-outline-variant bg-surface shrink-0 py-6">
         <div className="px-6 mb-8">
-          <Link href="/" className="hover:opacity-85 transition-opacity cursor-pointer block">
+          <Link href="/" className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer block">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/favicon.png"
+              alt="Synthesis AI Logo"
+              className="w-8 h-8 rounded-lg object-contain bg-surface-container-low p-0.5 border border-outline-variant"
+            />
             <h2 className="text-xl font-bold font-geist text-primary tracking-tight">
               Synthesis AI
             </h2>
@@ -738,7 +746,12 @@ export function DashboardClient({
         <header className="h-16 w-full flex justify-between items-center px-6 border-b border-outline-variant bg-surface-container-lowest sticky top-0 z-10 shrink-0">
           <div className="flex items-center gap-3 w-1/2">
             <Link href="/" className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer">
-              <Sparkles className="w-6 h-6 text-secondary" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/favicon.png"
+                alt="PitchPerfect Logo"
+                className="w-7 h-7 rounded object-contain bg-surface-container-low p-0.5 border border-outline-variant"
+              />
               <h1 className="text-lg font-bold font-geist text-primary tracking-tight">
                 PitchPerfect
               </h1>
@@ -776,14 +789,66 @@ export function DashboardClient({
               </select>
             </div>
 
-            <button
-              onClick={() => showNotification("No new notifications", "info")}
-              className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors active:scale-95 cursor-pointer relative"
-              title="Notifications"
-            >
-              <Bell className="w-5 h-5 text-outline" />
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-secondary"></span>
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowNotifications(!showNotifications);
+                  setUnreadNotifications(false);
+                }}
+                className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors active:scale-95 cursor-pointer relative"
+                title="Notifications"
+              >
+                <Bell className="w-5 h-5 text-outline" />
+                {unreadNotifications && (
+                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                )}
+              </button>
+              
+              <AnimatePresence>
+                {showNotifications && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 mt-2 w-80 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-xl z-50 overflow-hidden"
+                  >
+                    <div className="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+                      <span className="text-xs font-bold text-primary uppercase tracking-wider">Thông báo gần đây</span>
+                      <button
+                        onClick={() => {
+                          setUnreadNotifications(false);
+                          setShowNotifications(false);
+                        }}
+                        className="text-[10px] text-secondary font-bold uppercase hover:underline cursor-pointer"
+                      >
+                        Đóng
+                      </button>
+                    </div>
+                    <div className="max-h-64 overflow-y-auto divide-y divide-outline-variant/50">
+                      <div className="p-3.5 hover:bg-surface-container-low transition-colors text-left">
+                        <p className="text-xs font-semibold text-primary">Kết nối Gemini AI</p>
+                        <p className="text-[10px] text-on-surface-variant mt-0.5 leading-relaxed">
+                          {hasApiKey
+                            ? "Gemini AI đã được kết nối trực tuyến thành công. Sẵn sàng tạo các bản Pitch chất lượng cao."
+                            : "Đang chạy ở chế độ Chạy thử Local (Mã Gemini API chưa cấu hình)."}
+                        </p>
+                        <span className="text-[9px] text-outline font-medium block mt-1">Vừa xong</span>
+                      </div>
+                      <div className="p-3.5 hover:bg-surface-container-low transition-colors text-left">
+                        <p className="text-xs font-semibold text-primary">Trình quản lý hồ sơ</p>
+                        <p className="text-[10px] text-on-surface-variant mt-0.5 leading-relaxed">Đã đồng bộ thành công hồ sơ cá nhân Master Profile lên máy chủ lưu trữ đám mây.</p>
+                        <span className="text-[9px] text-outline font-medium block mt-1">10 phút trước</span>
+                      </div>
+                      <div className="p-3.5 hover:bg-surface-container-low transition-colors text-left">
+                        <p className="text-xs font-semibold text-primary">Phân tích tài liệu PDF</p>
+                        <p className="text-[10px] text-on-surface-variant mt-0.5 leading-relaxed">Trí tuệ nhân tạo đã quét và phân tích thành công tệp JD PDF được tải lên.</p>
+                        <span className="text-[9px] text-outline font-medium block mt-1">1 giờ trước</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             <button
               onClick={() => changeTab("help")}
               className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors active:scale-95 cursor-pointer"

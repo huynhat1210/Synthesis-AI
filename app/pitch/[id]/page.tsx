@@ -9,6 +9,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Sparkles, Mail, Globe, Briefcase, Award, CheckCircle, ArrowRight } from "lucide-react";
 import { readPitchPublic } from "@/lib/storage";
+import { PitchActions } from "./PitchActions";
 
 interface PitchPageProps {
   params: Promise<{ id: string }>;
@@ -51,9 +52,17 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
               Synthesis Portal
             </span>
           </Link>
-          <span className="bg-white/5 text-gray-400 px-3 py-1 rounded-full text-xs font-semibold border border-white/10">
-            Tailored Proposal Pitch
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="bg-white/5 text-gray-400 px-3 py-1 rounded-full text-xs font-semibold border border-white/10 hidden sm:inline">
+              Tailored Proposal Pitch
+            </span>
+            {/* ── Download & Copy Actions ── */}
+            <PitchActions
+              pitch={data}
+              profileFullName={profile.fullName}
+              profileJobTitle={profile.jobTitle}
+            />
+          </div>
         </header>
 
         {/* Content Grid */}
@@ -106,6 +115,26 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
               <p className="text-xs text-gray-400 leading-relaxed">
                 {data.pitch.scenarioB.content.normalize("NFC")}
               </p>
+
+              {/* Scenario B Stats */}
+              {data.pitch.scenarioB.stats && data.pitch.scenarioB.stats.length > 0 && (
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/10">
+                  {data.pitch.scenarioB.stats.map((stat, idx) => (
+                    <div key={idx} className="bg-white/5 rounded-lg p-3 border border-white/10">
+                      <p className="text-[11px] text-gray-400 leading-snug">{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Bottom Mobile Download Button */}
+            <div className="flex justify-center lg:hidden pt-4">
+              <PitchActions
+                pitch={data}
+                profileFullName={profile.fullName}
+                profileJobTitle={profile.jobTitle}
+              />
             </div>
           </div>
 
@@ -188,6 +217,14 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
 
           </div>
         </div>
+
+        {/* Footer */}
+        <footer className="mt-20 pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500">
+          <span>Powered by <strong className="text-gray-400">Synthesis AI</strong> — Context-Aware Pitch Engine</span>
+          <Link href="/dashboard" className="text-secondary-container hover:underline font-semibold">
+            Create your own pitch →
+          </Link>
+        </footer>
       </div>
     </div>
   );

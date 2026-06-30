@@ -15,9 +15,10 @@ interface SettingsViewProps {
   lang: Language;
   profile: MasterProfile;
   handleUpdatePlan: (plan: "free" | "pro") => void;
+  onOpenUpgradeModal: () => void;
 }
 
-export function SettingsView({ hasApiKey, handleResetState, lang, profile, handleUpdatePlan }: SettingsViewProps) {
+export function SettingsView({ hasApiKey, handleResetState, lang, profile, handleUpdatePlan, onOpenUpgradeModal }: SettingsViewProps) {
   const isPro = profile.plan === "pro";
 
   return (
@@ -55,12 +56,12 @@ export function SettingsView({ hasApiKey, handleResetState, lang, profile, handl
             </div>
             
             <button
-              onClick={() => handleUpdatePlan(isPro ? "free" : "pro")}
+              onClick={() => isPro ? handleUpdatePlan("free") : onOpenUpgradeModal()}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${isPro ? "border border-outline text-primary hover:bg-surface-container-low" : "bg-secondary text-on-secondary hover:bg-secondary/95 shadow-sm"}`}
             >
               {isPro
                 ? (lang === "vi" ? "Chuyển về Starter (Demo)" : "Switch to Starter (Demo)")
-                : (lang === "vi" ? "Nâng cấp lên Pro" : "Upgrade to Pro")}
+                : (lang === "vi" ? "Nâng cấp lên Pro (Thanh toán)" : "Upgrade to Pro (Pay Now)")}
             </button>
           </div>
         </div>

@@ -1558,12 +1558,13 @@ export function DashboardClient({
                     setProfileState(updated);
                     showNotification(
                       lang === "vi"
-                        ? `Đã chuyển đổi tài khoản thành ${newPlan === "pro" ? "PRO" : "Starter (Miễn phí)"}!`
-                        : `Plan switched to ${newPlan === "pro" ? "PRO" : "Starter (Free)"}!`,
-                      "success"
+                        ? `Đã chuyển đổi tài khoản về Starter (Miễn phí).`
+                        : `Plan switched back to Starter (Free).`,
+                      "info"
                     );
                     await syncProfileToServer(updated);
                   }}
+                  onOpenUpgradeModal={() => setShowUpgradeModal(true)}
                 />
               )}
 

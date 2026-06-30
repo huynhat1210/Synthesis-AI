@@ -7,7 +7,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Sparkles, Send, RefreshCw, User, Bot, Lightbulb, ChevronDown } from "lucide-react";
+import { Sparkles, Send, RefreshCw, User, Bot, Lightbulb, ChevronDown, Lock, Rocket } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
@@ -100,10 +100,16 @@ export function ChatView({ profile, lang }: ChatViewProps) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(true);
+  const [limitReached, setLimitReached] = useState(false);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  const isPro = profile.plan === "pro";
+  const FREE_LIMIT = 5;
+  // Count how many messages the user has sent in this session
+  const userMsgCount = messages.filter((m) => m.role === "user").length;
 
   const starterPrompts = lang === "vi" ? STARTER_PROMPTS_VI : STARTER_PROMPTS_EN;
 
@@ -152,6 +158,10 @@ export function ChatView({ profile, lang }: ChatViewProps) {
       const res = await sendChatMessageAction(messages, text.trim());
       if (res.data) {
         setMessages([...newMessages, { role: "assistant", content: res.data }]);
+      } else if (res.error === "LIMIT_REACHED") {
+        // Remove the optimistic user message and show the wall
+        setMessages(messages);
+        setLimitReached(true);
       } else {
         setMessages([
           ...newMessages,
@@ -179,6 +189,7 @@ export function ChatView({ profile, lang }: ChatViewProps) {
   const clearChat = async () => {
     setMessages([]);
     setInput("");
+    setLimitReached(false);
     await clearChatHistoryAction();
     setTimeout(() => inputRef.current?.focus(), 100);
   };
@@ -301,43 +312,77 @@ export function ChatView({ profile, lang }: ChatViewProps) {
         )}
       </AnimatePresence>
 
-      {/* Input Area */}
-      <div className="border-t border-outline-variant bg-surface px-4 py-3 shrink-0">
-        <div className="flex items-end gap-2 max-w-4xl mx-auto">
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            rows={1}
-            placeholder={
-              lang === "vi"
-                ? "Nhập câu hỏi của bạn... (Enter để gửi, Shift+Enter để xuống dòng)"
-                : "Type your question... (Enter to send, Shift+Enter for new line)"
-            }
-            disabled={loading || historyLoading}
-            className="flex-1 resize-none bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm text-primary placeholder:text-on-surface-variant outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/10 transition-all leading-relaxed max-h-32 overflow-y-auto disabled:opacity-60"
-            style={{ minHeight: "46px" }}
-            onInput={(e) => {
-              const target = e.target as HTMLTextAreaElement;
-              target.style.height = "auto";
-              target.style.height = `${Math.min(target.scrollHeight, 128)}px`;
-            }}
-          />
-          <button
-            onClick={() => sendMessage(input)}
-            disabled={!input.trim() || loading || historyLoading}
-            className="w-11 h-11 rounded-xl bg-secondary text-on-secondary flex items-center justify-center shrink-0 hover:bg-secondary/90 active:scale-95 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-sm shadow-secondary/20"
-          >
-            {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-          </button>
+      {/* Input Area or Upgrade Wall */}
+      {limitReached && !isPro ? (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="border-t border-outline-variant bg-surface shrink-0 px-5 py-4"
+        >
+          <div className="flex flex-col sm:flex-row items-center gap-3 p-4 rounded-xl bg-amber-50 border border-amber-200">
+            <div className="w-9 h-9 rounded-full bg-amber-100 border border-amber-200 flex items-center justify-center shrink-0">
+              <Lock className="w-4 h-4 text-amber-600" />
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <p className="text-sm font-bold text-amber-800">
+                {lang === "vi" ? `Đã dùng hết ${FREE_LIMIT} tin nhắn miễn phí` : `Free limit reached (${FREE_LIMIT} messages)`}
+              </p>
+              <p className="text-xs text-amber-700 mt-0.5">
+                {lang === "vi"
+                  ? "Nâng cấp lên Pro để tiếp tục trò chuyện không giới hạn với AI."
+                  : "Upgrade to Pro for unlimited AI career conversations."}
+              </p>
+            </div>
+            <a
+              href="/dashboard?tab=settings"
+              className="flex items-center gap-2 px-4 py-2 bg-secondary text-on-secondary rounded-xl text-xs font-bold shadow-sm hover:bg-secondary/90 active:scale-95 transition-all cursor-pointer shrink-0"
+            >
+              <Rocket className="w-3.5 h-3.5" />
+              {lang === "vi" ? "Nâng cấp Pro" : "Upgrade to Pro"}
+            </a>
+          </div>
+          <p className="text-[10px] text-on-surface-variant text-center mt-2 opacity-50">
+            {lang === "vi" ? `Gói Starter: ${userMsgCount}/${FREE_LIMIT} tin nhắn đã dùng` : `Starter plan: ${userMsgCount}/${FREE_LIMIT} messages used`}
+          </p>
+        </motion.div>
+      ) : (
+        <div className="border-t border-outline-variant bg-surface px-4 py-3 shrink-0">
+          <div className="flex items-end gap-2 max-w-4xl mx-auto">
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              rows={1}
+              placeholder={
+                lang === "vi"
+                  ? "Nhập câu hỏi của bạn... (Enter để gửi, Shift+Enter để xuống dòng)"
+                  : "Type your question... (Enter to send, Shift+Enter for new line)"
+              }
+              disabled={loading || historyLoading}
+              className="flex-1 resize-none bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm text-primary placeholder:text-on-surface-variant outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/10 transition-all leading-relaxed max-h-32 overflow-y-auto disabled:opacity-60"
+              style={{ minHeight: "46px" }}
+              onInput={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = "auto";
+                target.style.height = `${Math.min(target.scrollHeight, 128)}px`;
+              }}
+            />
+            <button
+              onClick={() => sendMessage(input)}
+              disabled={!input.trim() || loading || historyLoading}
+              className="w-11 h-11 rounded-xl bg-secondary text-on-secondary flex items-center justify-center shrink-0 hover:bg-secondary/90 active:scale-95 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-sm shadow-secondary/20"
+            >
+              {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            </button>
+          </div>
+          <p className="text-[10px] text-on-surface-variant text-center mt-2 opacity-60">
+            {isPro
+              ? (lang === "vi" ? "✨ Pro — Không giới hạn tin nhắn — Lịch sử được lưu tự động." : "✨ Pro — Unlimited messages — History auto-saved.")
+              : (lang === "vi" ? `Gói Starter: ${userMsgCount}/${FREE_LIMIT} tin nhắn đã dùng · AI có thể mắc lỗi.` : `Starter: ${userMsgCount}/${FREE_LIMIT} messages used · AI can make mistakes.`)}
+          </p>
         </div>
-        <p className="text-[10px] text-on-surface-variant text-center mt-2 opacity-60">
-          {lang === "vi"
-            ? "Lịch sử trò chuyện được lưu tự động · AI có thể mắc lỗi."
-            : "Conversation history is saved automatically · AI can make mistakes."}
-        </p>
-      </div>
+      )}
     </div>
   );
 }

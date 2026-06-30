@@ -79,6 +79,19 @@ export async function sendChatMessageAction(
   // Load user profile for context-aware advice
   const profile = await readProfile(userId);
 
+  // ── Plan-based chat limit ─────────────────────────────────────────────────
+  const FREE_LIMIT = 5;
+  if (profile?.plan !== "pro") {
+    const session = await prisma.chatSession.findUnique({
+      where: { userId },
+      include: { _count: { select: { messages: { where: { role: "user" } } } } },
+    });
+    const userMsgCount = session?._count?.messages ?? 0;
+    if (userMsgCount >= FREE_LIMIT) {
+      return { data: null, error: "LIMIT_REACHED" };
+    }
+  }
+
   const profileContext = profile
     ? `
 === USER MASTER PROFILE ===

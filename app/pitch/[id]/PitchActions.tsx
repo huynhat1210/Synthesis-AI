@@ -1,21 +1,31 @@
 /**
  * @file app/pitch/[id]/PitchActions.tsx
  * @description Client component — action buttons for the public pitch page.
- *              Handles PDF export, copy to clipboard, and email connect.
+ *              Handles PDF export with a clean, professional single-color layout.
  */
 "use client";
 
 import React, { useState } from "react";
-import { FileDown, Copy, Check, Share2, Printer } from "lucide-react";
+import { FileDown, Copy, Check } from "lucide-react";
 import type { SavedPitch } from "@/types";
 
 interface PitchActionsProps {
   pitch: SavedPitch;
   profileFullName: string;
   profileJobTitle: string;
+  profileBio?: string;
 }
 
-export function PitchActions({ pitch, profileFullName, profileJobTitle }: PitchActionsProps) {
+// Safely normalize text to avoid broken Vietnamese characters in print window
+function n(text: string): string {
+  try {
+    return (text || "").normalize("NFC");
+  } catch {
+    return text || "";
+  }
+}
+
+export function PitchActions({ pitch, profileFullName, profileJobTitle, profileBio }: PitchActionsProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = () => {
@@ -28,175 +38,308 @@ export function PitchActions({ pitch, profileFullName, profileJobTitle }: PitchA
     const p = pitch.pitch;
     const ctx = pitch.context;
 
+    const dateStr = new Date(pitch.createdAt).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+
     const bulletsHtml =
       p.scenarioA.bullets && p.scenarioA.bullets.length > 0
-        ? `<ul class="bullets">${p.scenarioA.bullets.map((b) => `<li>${b}</li>`).join("")}</ul>`
+        ? p.scenarioA.bullets
+            .map(
+              (b) =>
+                `<div class="bullet-row">
+                  <div class="bullet-check">✓</div>
+                  <div class="bullet-text">${n(b)}</div>
+                </div>`
+            )
+            .join("")
         : "";
 
     const statsHtml =
       p.scenarioB.stats && p.scenarioB.stats.length > 0
         ? `<div class="stats-grid">${p.scenarioB.stats
-            .map((s) => `<div class="stat-item"><strong>${s.label}</strong></div>`)
+            .map((s) => `<div class="stat-card">${n(s.label)}</div>`)
             .join("")}</div>`
         : "";
 
     const htmlContent = `<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Pitch Proposal — ${profileFullName}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pitch Proposal — ${n(profileFullName)}</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* ─── Reset ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ─── Base ─── */
     body {
-      font-family: "Segoe UI", Roboto, -apple-system, sans-serif;
-      color: #111827;
-      background: #fff;
-      padding: 48px 56px;
-      line-height: 1.65;
-      font-size: 14px;
+      font-family: "Segoe UI", Arial, "Helvetica Neue", sans-serif;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #1a1a1a;
+      background: #ffffff;
+      padding: 0;
     }
 
-    /* ── Header ── */
-    .header {
+    /* ─── Page ─── */
+    .page {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 52px 60px 60px;
+    }
+
+    /* ─── Top Bar ─── */
+    .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      border-bottom: 3px solid #3b82f6;
       padding-bottom: 20px;
-      margin-bottom: 36px;
-    }
-    .brand { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; color: #2563eb; }
-    .meta { font-size: 11px; color: #6b7280; text-align: right; }
-    .meta strong { color: #374151; }
-
-    /* ── Profile Strip ── */
-    .profile-strip {
-      background: #f8fafc;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 16px 20px;
       margin-bottom: 32px;
+      border-bottom: 2px solid #1a1a1a;
+    }
+    .brand-block {}
+    .brand-name {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #1a1a1a;
+      display: block;
+    }
+    .brand-sub {
+      font-size: 10px;
+      color: #6b6b6b;
+      display: block;
+      margin-top: 2px;
+    }
+    .meta-block { text-align: right; }
+    .meta-row {
+      font-size: 11px;
+      color: #4a4a4a;
+      line-height: 1.6;
+    }
+    .meta-row strong { color: #1a1a1a; font-weight: 700; }
+
+    /* ─── Profile Strip ─── */
+    .profile-strip {
       display: flex;
       align-items: center;
       gap: 16px;
+      padding: 16px 20px;
+      background: #f5f5f5;
+      border-radius: 6px;
+      margin-bottom: 36px;
     }
     .avatar {
-      width: 48px; height: 48px; border-radius: 50%;
-      background: #dbeafe; color: #1d4ed8;
-      font-size: 20px; font-weight: 900;
-      display: flex; align-items: center; justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
     }
-    .profile-info h2 { font-size: 16px; font-weight: 800; color: #111827; }
-    .profile-info p { font-size: 12px; color: #6b7280; font-weight: 500; }
+    .profile-name { font-size: 15px; font-weight: 800; color: #1a1a1a; }
+    .profile-title { font-size: 11px; color: #6b6b6b; font-weight: 500; margin-top: 1px; }
 
-    /* ── Section Titles ── */
-    .section-tag {
-      font-size: 9px; font-weight: 900; text-transform: uppercase;
-      letter-spacing: 2.5px; color: #3b82f6; margin-bottom: 8px;
+    /* ─── Section Label ─── */
+    .section-label {
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #6b6b6b;
+      margin-bottom: 10px;
+      display: block;
     }
-    h1.pitch-title {
-      font-size: 26px; font-weight: 900; color: #111827;
-      line-height: 1.25; margin-bottom: 14px; font-family: Georgia, serif;
-    }
-    .pitch-body { font-size: 14px; color: #374151; margin-bottom: 28px; }
 
-    /* ── Focus Pillars ── */
-    .pillars-box {
-      background: #eff6ff; border: 1px solid #bfdbfe;
-      border-radius: 10px; padding: 20px 24px; margin-bottom: 28px;
+    /* ─── Pitch Title ─── */
+    .pitch-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: #1a1a1a;
+      line-height: 1.25;
+      margin-bottom: 16px;
+      letter-spacing: -0.3px;
     }
-    .pillars-title {
-      font-size: 9px; font-weight: 900; text-transform: uppercase;
-      letter-spacing: 2px; color: #1d4ed8; margin-bottom: 12px;
-    }
-    .bullets { padding-left: 0; list-style: none; }
-    .bullets li {
-      font-size: 13px; color: #1e3a8a;
-      padding: 6px 0; border-bottom: 1px solid #dbeafe;
-      display: flex; align-items: flex-start; gap: 10px;
-    }
-    .bullets li:last-child { border-bottom: none; }
-    .bullets li::before { content: "✓"; color: #2563eb; font-weight: 900; flex-shrink: 0; }
 
-    /* ── Scenario B ── */
-    .scenario-b {
-      background: #0f172a; border-radius: 10px;
-      padding: 24px 28px; margin-bottom: 36px; color: #e2e8f0;
+    /* ─── Body Text ─── */
+    .pitch-body {
+      font-size: 13px;
+      color: #2d2d2d;
+      line-height: 1.75;
+      margin-bottom: 32px;
     }
-    .scenario-b-tag {
-      font-size: 9px; font-weight: 900; text-transform: uppercase;
-      letter-spacing: 2px; color: #7dd3fc; margin-bottom: 6px;
+
+    /* ─── Divider ─── */
+    .divider {
+      height: 1px;
+      background: #e0e0e0;
+      margin: 28px 0;
     }
-    .scenario-b h4 { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 10px; }
-    .scenario-b p { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+
+    /* ─── Focus Pillars ─── */
+    .pillars-header {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2.5px;
+      color: #4a4a4a;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .bullet-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 9px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .bullet-row:last-child { border-bottom: none; }
+    .bullet-check {
+      font-size: 12px;
+      font-weight: 900;
+      color: #1a1a1a;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .bullet-text {
+      font-size: 13px;
+      color: #2d2d2d;
+      line-height: 1.6;
+    }
+
+    /* ─── Scenario B ─── */
+    .scenario-b-box {
+      background: #f5f5f5;
+      border-left: 3px solid #1a1a1a;
+      border-radius: 0 6px 6px 0;
+      padding: 22px 24px;
+      margin-top: 32px;
+    }
+    .scenario-b-label {
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #6b6b6b;
+      margin-bottom: 8px;
+    }
+    .scenario-b-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #1a1a1a;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+    .scenario-b-body {
+      font-size: 12.5px;
+      color: #4a4a4a;
+      line-height: 1.7;
+    }
+
+    /* ─── Stats ─── */
     .stats-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr);
-      gap: 8px; margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 16px;
     }
-    .stat-item {
-      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; padding: 10px 12px; font-size: 11px; color: #cbd5e1;
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid #d8d8d8;
+      border-radius: 5px;
+      padding: 10px 12px;
+      font-size: 11.5px;
+      color: #2d2d2d;
+      line-height: 1.5;
     }
 
-    /* ── Footer ── */
+    /* ─── Footer ─── */
     .footer {
-      margin-top: 48px; border-top: 1px solid #e5e7eb;
-      padding-top: 16px; font-size: 10px; color: #9ca3af;
-      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 48px;
+      padding-top: 16px;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9.5px;
+      color: #9a9a9a;
     }
 
+    /* ─── Print overrides ─── */
     @media print {
-      body { padding: 30px 40px; }
-      .no-print { display: none !important; }
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .page { padding: 40px 48px 48px; }
     }
   </style>
 </head>
 <body>
+<div class="page">
 
-  <div class="header">
-    <div>
-      <div class="brand">Synthesis AI — Pitch Proposal</div>
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="brand-block">
+      <span class="brand-name">Synthesis AI</span>
+      <span class="brand-sub">Pitch Proposal Document</span>
     </div>
-    <div class="meta">
-      Prepared for: <strong>${ctx.targetAudience}</strong><br/>
-      Goal: <strong>${ctx.pitchGoal}</strong><br/>
-      Date: <strong>${new Date(pitch.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}</strong>
+    <div class="meta-block">
+      <div class="meta-row">Prepared for: <strong>${n(ctx.targetAudience)}</strong></div>
+      <div class="meta-row">Goal: <strong>${n(ctx.pitchGoal)}</strong></div>
+      <div class="meta-row">Date: <strong>${dateStr}</strong></div>
     </div>
   </div>
 
+  <!-- Profile -->
   <div class="profile-strip">
-    <div class="avatar">${profileFullName.slice(0, 1).toUpperCase()}</div>
-    <div class="profile-info">
-      <h2>${profileFullName}</h2>
-      <p>${profileJobTitle}</p>
+    <div class="avatar">${n(profileFullName).slice(0, 1).toUpperCase()}</div>
+    <div>
+      <div class="profile-name">${n(profileFullName)}</div>
+      <div class="profile-title">${n(profileJobTitle)}</div>
     </div>
   </div>
 
-  <div class="section-tag">Strategic Proposal — Scenario A</div>
-  <h1 class="pitch-title">${p.scenarioA.title}</h1>
-  <div class="pitch-body">${p.scenarioA.content}</div>
+  <!-- Scenario A -->
+  <span class="section-label">Strategic Proposal — Scenario A</span>
+  <h1 class="pitch-title">${n(p.scenarioA.title)}</h1>
+  <div class="pitch-body">${n(p.scenarioA.content)}</div>
 
-  ${bulletsHtml ? `<div class="pillars-box"><div class="pillars-title">Strategic Focus Pillars</div>${bulletsHtml}</div>` : ""}
+  ${bulletsHtml ? `
+  <div class="divider"></div>
+  <div class="pillars-header">Strategic Focus Pillars</div>
+  ${bulletsHtml}
+  ` : ""}
 
-  <div class="scenario-b">
-    <div class="scenario-b-tag">Alternative Vision — ${p.scenarioB.label}</div>
-    <h4>${p.scenarioB.title}</h4>
-    <p>${p.scenarioB.content}</p>
+  <!-- Scenario B -->
+  <div class="scenario-b-box">
+    <div class="scenario-b-label">Alternative Approach — ${n(p.scenarioB.label)}</div>
+    <div class="scenario-b-title">${n(p.scenarioB.title)}</div>
+    <div class="scenario-b-body">${n(p.scenarioB.content)}</div>
     ${statsHtml}
   </div>
 
+  <!-- Footer -->
   <div class="footer">
-    <span>Generated via Synthesis AI · ${window.location.href}</span>
-    <span>${profileFullName} · ${profileJobTitle}</span>
+    <span>Generated via Synthesis AI</span>
+    <span>${n(profileFullName)} &nbsp;·&nbsp; ${n(profileJobTitle)}</span>
   </div>
 
-  <script>
-    window.onload = function () {
-      window.print();
-      setTimeout(function () { window.close(); }, 800);
-    };
-  </script>
+</div>
+<script>
+  window.onload = function () {
+    window.print();
+    setTimeout(function () { window.close(); }, 1000);
+  };
+</script>
 </body>
 </html>`;
 
@@ -205,6 +348,7 @@ export function PitchActions({ pitch, profileFullName, profileJobTitle }: PitchA
       alert("Pop-up blocked! Please allow pop-ups to export PDF.");
       return;
     }
+    printWindow.document.open();
     printWindow.document.write(htmlContent);
     printWindow.document.close();
   };
@@ -230,7 +374,7 @@ export function PitchActions({ pitch, profileFullName, profileJobTitle }: PitchA
         )}
       </button>
 
-      {/* Download / Print PDF */}
+      {/* Download PDF */}
       <button
         onClick={handleExportPdf}
         className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 border border-blue-500 rounded-lg transition-all cursor-pointer shadow-lg shadow-blue-900/30 active:scale-95"

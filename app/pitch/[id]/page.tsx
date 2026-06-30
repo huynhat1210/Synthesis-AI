@@ -63,13 +63,13 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
           <div className="lg:col-span-7 space-y-8">
             <div className="space-y-4">
               <span className="text-xs text-secondary-container uppercase font-bold tracking-widest">
-                Optimized Proposal for {data.context.targetAudience}
+                Optimized Proposal for {data.context.targetAudience.normalize("NFC")}
               </span>
               <h1 className="text-3xl md:text-4xl font-geist text-white font-black leading-tight tracking-tight">
-                {data.pitch.scenarioA.title}
+                {data.pitch.scenarioA.title.normalize("NFC")}
               </h1>
               <p className="text-base text-gray-300 leading-relaxed">
-                {data.pitch.scenarioA.content}
+                {data.pitch.scenarioA.content.normalize("NFC")}
               </p>
             </div>
 
@@ -83,7 +83,7 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
                   {data.pitch.scenarioA.bullets.map((bullet, idx) => (
                     <li key={idx} className="flex items-start gap-3 text-sm text-gray-300 leading-relaxed">
                       <CheckCircle className="w-5 h-5 text-secondary-container mt-0.5 shrink-0" />
-                      <span>{bullet}</span>
+                      <span>{bullet.normalize("NFC")}</span>
                     </li>
                   ))}
                 </ul>
@@ -94,17 +94,17 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
             <div className="border border-white/5 rounded-xl p-6 bg-[#0c1020] space-y-4">
               <div className="flex justify-between items-center border-b border-white/10 pb-3">
                 <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">
-                  Alternative Vision: {data.pitch.scenarioB.label}
+                  Alternative Vision: {data.pitch.scenarioB.label.normalize("NFC")}
                 </span>
                 <span className="text-[10px] bg-secondary/20 text-secondary-container px-2 py-0.5 rounded font-semibold uppercase">
                   Agile
                 </span>
               </div>
               <h4 className="text-lg font-bold text-white">
-                {data.pitch.scenarioB.title}
+                {data.pitch.scenarioB.title.normalize("NFC")}
               </h4>
               <p className="text-xs text-gray-400 leading-relaxed">
-                {data.pitch.scenarioB.content}
+                {data.pitch.scenarioB.content.normalize("NFC")}
               </p>
             </div>
           </div>
@@ -115,12 +115,12 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
             {/* Header info */}
             <div className="flex items-center gap-4 border-b border-white/10 pb-6">
               <div className="w-14 h-14 rounded-full bg-secondary/15 flex items-center justify-center font-bold text-xl text-secondary-container border border-white/15">
-                {profile.fullName.slice(0, 1) || "P"}
+                {profile.fullName.slice(0, 1).toUpperCase() || "P"}
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">{profile.fullName}</h2>
+                <h2 className="text-lg font-bold text-white">{profile.fullName.normalize("NFC")}</h2>
                 <p className="text-xs text-secondary-container font-semibold mt-0.5">
-                  {profile.jobTitle}
+                  {profile.jobTitle.normalize("NFC")}
                 </p>
               </div>
             </div>
@@ -128,7 +128,7 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
             {/* Biography */}
             <div className="space-y-2">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">About Me</h3>
-              <p className="text-xs text-gray-300 leading-relaxed">{profile.bio}</p>
+              <p className="text-xs text-gray-300 leading-relaxed">{profile.bio.normalize("NFC")}</p>
             </div>
 
             {/* Key Skills */}
@@ -139,9 +139,9 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
                   {profile.skills.map((skill) => (
                     <span
                       key={skill}
-                      className="bg-white/5 border border-white/10 text-gray-300 px-2.5 py-1 rounded-md text-[10px] font-medium"
+                      className="bg-white/10 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/10"
                     >
-                      {skill}
+                      {skill.normalize("NFC")}
                     </span>
                   ))}
                 </div>

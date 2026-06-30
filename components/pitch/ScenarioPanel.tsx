@@ -65,10 +65,10 @@ export function ScenarioPanel({ scenario, type, onCopy, copiedId }: ScenarioPane
               ? "bg-surface-container text-on-surface-variant"
               : "bg-secondary-container/40 text-on-secondary-container"
           )}>
-            {scenario.label}
+            {scenario.label.normalize("NFC")}
           </span>
           <h3 className="text-base font-bold font-geist text-primary leading-tight">
-            {scenario.title}
+            {scenario.title.normalize("NFC")}
           </h3>
         </div>
         <button
@@ -81,7 +81,9 @@ export function ScenarioPanel({ scenario, type, onCopy, copiedId }: ScenarioPane
       </div>
 
       {/* Content paragraph */}
-      <p className="text-sm text-on-surface-variant leading-relaxed">{scenario.content}</p>
+      <p className="text-sm text-on-surface-variant leading-relaxed">
+        {scenario.content.normalize("NFC")}
+      </p>
 
       {/* Scenario A: bullets */}
       {isA && scenarioA && (
@@ -89,7 +91,7 @@ export function ScenarioPanel({ scenario, type, onCopy, copiedId }: ScenarioPane
           {scenarioA.bullets.map((b, i) => (
             <li key={i} className="flex items-start gap-2 text-sm text-on-surface">
               <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-secondary shrink-0" />
-              {b}
+              {b.normalize("NFC")}
             </li>
           ))}
         </ul>
@@ -105,9 +107,9 @@ export function ScenarioPanel({ scenario, type, onCopy, copiedId }: ScenarioPane
             >
               <StatIcon name={stat.icon} />
               {stat.value && (
-                <span className="text-sm font-bold text-secondary">{stat.value}</span>
+                <span className="text-sm font-bold text-secondary">{stat.value.normalize("NFC")}</span>
               )}
-              <span className="text-xs font-semibold text-center">{stat.label}</span>
+              <span className="text-xs font-semibold text-center">{stat.label.normalize("NFC")}</span>
             </div>
           ))}
         </div>

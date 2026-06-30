@@ -179,36 +179,76 @@ html,body{
   text-align: left;
 }
 
-/* ─── DIVIDER ─── */
-.rule{border: none; border-top: 1px solid #e5e5e5; margin: 28px 0}
-
-/* ─── PROFILE ROW ─── */
-.profile{
+/* ─── 2-COLUMN LAYOUT GRID ─── */
+.pdf-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+.pdf-main {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
+  flex-direction: column;
+}
+.pdf-sidebar {
   background: #f8f9fa;
   border: 1px solid #eaeaea;
   border-radius: 8px;
-  margin-bottom: 36px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
-.avatar{
-  width: 44px; height: 44px;
+
+/* ─── PROFILE CARD ─── */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eaeaea;
+}
+.avatar {
+  width: 38px; height: 38px;
   border-radius: 50%;
   background: #111;
   color: #fff;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.pname{font-size: 15px; font-weight: 700; color: #111}
-.ptitle{font-size: 11px; color: #666; margin-top: 2px; font-weight: 500}
+.pname { font-size: 14px; font-weight: 700; color: #111; }
+.ptitle { font-size: 10.5px; color: #666; margin-top: 1px; font-weight: 500; }
+
+/* ─── SIDEBAR SECTIONS ─── */
+.sidebar-sec {
+  page-break-inside: avoid;
+}
+.sidebar-head {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #495057;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 4px;
+}
+.sidebar-desc {
+  font-size: 11px;
+  color: #495057;
+  line-height: 1.65;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+/* ─── DIVIDER ─── */
+.rule{border: none; border-top: 1px solid #e5e5e5; margin: 24px 0}
 
 /* ─── SECTION LABELS ─── */
 .label{
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -219,20 +259,20 @@ html,body{
 
 /* ─── PITCH TITLE ─── */
 .pitch-title{
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   color: #111;
   line-height: 1.3;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   letter-spacing: -0.5px;
 }
 
 /* ─── BODY TEXT ─── */
 .body{
-  font-size: 13px;
+  font-size: 12.5px;
   color: #2b2b2b;
-  line-height: 1.8;
-  margin-bottom: 28px;
+  line-height: 1.75;
+  margin-bottom: 24px;
   text-align: justify;
   text-justify: inter-word;
 }
@@ -253,19 +293,19 @@ html,body{
   border-collapse: collapse;
 }
 .pillars-table td{
-  padding: 10px 0;
+  padding: 8px 0;
   vertical-align: top;
   border-bottom: 1px solid #f0f0f0;
 }
 .pillars-table .check{
-  width: 24px;
+  width: 20px;
   font-weight: 700;
   color: #111;
 }
 .pillars-table .btext{
-  font-size: 12.5px;
+  font-size: 12px;
   color: #333;
-  line-height: 1.7;
+  line-height: 1.65;
   text-align: justify;
   text-justify: inter-word;
 }
@@ -276,8 +316,8 @@ html,body{
   background: #f8f9fa;
   border-left: 4px solid #111;
   border-radius: 0 8px 8px 0;
-  padding: 24px 28px;
-  margin-top: 36px;
+  padding: 20px 22px;
+  margin-top: 28px;
   border-top: 1px solid #eaeaea;
   border-right: 1px solid #eaeaea;
   border-bottom: 1px solid #eaeaea;
@@ -289,19 +329,19 @@ html,body{
   text-transform: uppercase;
   letter-spacing: 2px;
   color: #777;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 .scenb-title{
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: #111;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   line-height: 1.35;
 }
 .scenb-body{
-  font-size: 12.5px;
+  font-size: 12px;
   color: #3b3b3b;
-  line-height: 1.75;
+  line-height: 1.7;
   text-align: justify;
   text-justify: inter-word;
 }
@@ -310,17 +350,17 @@ html,body{
 .stats{
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-top: 18px;
+  gap: 8px;
+  margin-top: 14px;
 }
 .stat{
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 6px;
-  padding: 12px 14px;
-  font-size: 11.5px;
+  padding: 10px 12px;
+  font-size: 11px;
   color: #333;
-  line-height: 1.5;
+  line-height: 1.4;
   font-weight: 500;
 }
 
@@ -328,49 +368,51 @@ html,body{
 .pdf-skills {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
+  gap: 4px;
+  margin-top: 6px;
 }
 .pdf-skill-tag {
-  font-size: 10.5px;
+  font-size: 9.5px;
   font-weight: 600;
-  background: #f1f3f5;
-  border: 1px solid #e9ecef;
+  background: #fff;
+  border: 1px solid #dee2e6;
   color: #495057;
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: 4px;
 }
 .pdf-projects {
-  margin-top: 10px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 .pdf-project-card {
-  margin-bottom: 12px;
-  padding: 12px 14px;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid #dee2e6;
   border-radius: 6px;
   page-break-inside: avoid;
 }
 .pdf-project-title {
-  font-size: 12.5px;
+  font-size: 11.5px;
   font-weight: 700;
   color: #1a1a1a;
 }
 .pdf-project-meta {
-  font-size: 10px;
+  font-size: 9px;
   color: #6c757d;
-  margin: 3px 0 6px;
+  margin: 2px 0 4px;
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
 }
 .pdf-project-meta strong {
   color: #495057;
 }
 .pdf-project-desc {
-  font-size: 11.5px;
+  font-size: 10.5px;
   color: #495057;
-  line-height: 1.6;
+  line-height: 1.5;
   text-align: justify;
   text-justify: inter-word;
 }
@@ -393,7 +435,7 @@ html,body{
 /* ─── PRINT PAGE SPEC ─── */
 @page {
   size: A4;
-  margin: 20mm 20mm 20mm 20mm;
+  margin: 18mm 18mm 18mm 18mm;
 }
 @media print {
   body {
@@ -424,62 +466,67 @@ html,body{
     </div>
   </div>
 
-  <!-- Profile Header Card -->
-  <div class="profile section">
-    <div class="avatar">${fullName.slice(0,1).toUpperCase()}</div>
-    <div>
-      <div class="pname">${fullName}</div>
-      <div class="ptitle">${jobTitle}</div>
-    </div>
-  </div>
-
-  <!-- Scenario A -->
-  <div class="section">
-    <span class="label">Strategic Proposal — Scenario A</span>
-    <div class="pitch-title">${sanitize(p.scenarioA.title)}</div>
-    <div class="body">${sanitize(p.scenarioA.content)}</div>
-  </div>
-
-  ${bulletsHtml ? `
-  <div class="section">
-    <hr class="rule"/>
-    <div class="pillars-head">Strategic Focus Pillars</div>
-    <table class="pillars-table"><tbody>${bulletsHtml}</tbody></table>
-    <hr class="rule"/>
-  </div>` : "<hr class=\"rule\"/>"}
-
-  <!-- Scenario B -->
-  <div class="scenb section">
-    <div class="scenb-label">Alternative Approach — ${sanitize(p.scenarioB.label)}</div>
-    <div class="scenb-title">${sanitize(p.scenarioB.title)}</div>
-    <div class="scenb-body">${sanitize(p.scenarioB.content)}</div>
-    ${statsHtml}
-  </div>
-
-  <!-- Professional Profile Details Section -->
-  <div class="section" style="margin-top: 36px;">
-    <hr class="rule"/>
-    <span class="label" style="margin-bottom: 16px;">Professional Biography &amp; Profile Details</span>
+  <!-- 2-COLUMN LAYOUT -->
+  <div class="pdf-grid">
     
-    <!-- About Me / Bio -->
-    <div style="margin-bottom: 24px;">
-      <h3 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #495057; margin-bottom: 6px; letter-spacing: 1px;">About Me</h3>
-      <p class="body" style="margin-bottom: 0;">${sanitize(profile.bio)}</p>
+    <!-- LEFT COLUMN: Scenarios -->
+    <div class="pdf-main">
+      <!-- Scenario A -->
+      <div class="section">
+        <span class="label">Strategic Proposal — Scenario A</span>
+        <div class="pitch-title">${sanitize(p.scenarioA.title)}</div>
+        <div class="body">${sanitize(p.scenarioA.content)}</div>
+      </div>
+
+      ${bulletsHtml ? `
+      <div class="section" style="margin-bottom: 24px;">
+        <div class="pillars-head">Strategic Focus Pillars</div>
+        <table class="pillars-table"><tbody>${bulletsHtml}</tbody></table>
+      </div>` : ""}
+
+      <!-- Scenario B -->
+      <div class="scenb section">
+        <div class="scenb-label">Alternative Approach — ${sanitize(p.scenarioB.label)}</div>
+        <div class="scenb-title">${sanitize(p.scenarioB.title)}</div>
+        <div class="scenb-body">${sanitize(p.scenarioB.content)}</div>
+        ${statsHtml}
+      </div>
     </div>
 
-    <!-- Skills -->
-    ${skillsHtml ? `
-    <div style="margin-bottom: 24px; page-break-inside: avoid;">
-      <h3 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #495057; margin-bottom: 8px; letter-spacing: 1px;">Core Capabilities</h3>
-      <div class="pdf-skills">${skillsHtml}</div>
-    </div>` : ""}
+    <!-- RIGHT COLUMN: Sidebar (Bio, Skills, Projects) -->
+    <div class="pdf-sidebar">
+      
+      <!-- Profile Header Card -->
+      <div class="profile">
+        <div class="avatar">${fullName.slice(0,1).toUpperCase()}</div>
+        <div>
+          <div class="pname">${fullName}</div>
+          <div class="ptitle">${jobTitle}</div>
+        </div>
+      </div>
 
-    <!-- Projects -->
-    ${projectsHtml ? `
-    <div style="margin-bottom: 0; page-break-inside: avoid;">
-      <h3 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #495057; margin-bottom: 10px; letter-spacing: 1px;">Portfolio Proof Points</h3>
-      <div class="pdf-projects">${projectsHtml}</div>
-    </div>` : ""}
+      <!-- About Me / Bio -->
+      <div class="sidebar-sec">
+        <h3 class="sidebar-head">About Me</h3>
+        <p class="sidebar-desc">${sanitize(profile.bio)}</p>
+      </div>
+
+      <!-- Skills -->
+      ${skillsHtml ? `
+      <div class="sidebar-sec">
+        <h3 class="sidebar-head">Core Capabilities</h3>
+        <div class="pdf-skills">${skillsHtml}</div>
+      </div>` : ""}
+
+      <!-- Projects -->
+      ${projectsHtml ? `
+      <div class="sidebar-sec">
+        <h3 class="sidebar-head">Portfolio Proof Points</h3>
+        <div class="pdf-projects">${projectsHtml}</div>
+      </div>` : ""}
+
+    </div>
+
   </div>
 
   <!-- Footer -->

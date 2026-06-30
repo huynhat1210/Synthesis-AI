@@ -41,6 +41,7 @@ import { saveProfileAction } from "@/actions/saveProfile";
 import { starPitchAction, deletePitchAction } from "@/actions/managePitches";
 import { parsePdfAction } from "@/actions/parsePdf";
 import { createProfileAction, selectProfileAction } from "@/actions/manageProfiles";
+import { createCheckoutSessionAction, verifyCheckoutSessionAction } from "@/actions/stripe";
 import { cn } from "@/lib/utils";
 import { translations, type Language } from "@/lib/translations";
 
@@ -137,6 +138,48 @@ export function DashboardClient({
     }
   }, []);
 
+  // ── Stripe Checkout Verification mount hook ──
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const payment = urlParams.get("payment");
+      const sessionId = urlParams.get("session_id");
+
+      if (payment === "success" && sessionId) {
+        const verifyPayment = async () => {
+          setLoading(true);
+          try {
+            const res = await verifyCheckoutSessionAction(sessionId);
+            if (res.data) {
+              setProfileState(res.data);
+              showNotification(
+                lang === "vi"
+                  ? "Chúc mừng! Bạn đã nâng cấp thành công lên gói PRO thực tế thông qua Stripe!"
+                  : "Congratulations! You successfully upgraded to the real PRO plan via Stripe!",
+                "success"
+              );
+              // Clear query parameters
+              window.history.replaceState({}, document.title, window.location.pathname);
+            } else {
+              showNotification(res.error || "Failed to verify transaction.", "error");
+            }
+          } catch (err: any) {
+            showNotification(err.message || "Failed to verify payment.", "error");
+          } finally {
+            setLoading(false);
+          }
+        };
+        verifyPayment();
+      } else if (payment === "cancel") {
+        showNotification(
+          lang === "vi" ? "Giao dịch nâng cấp đã bị hủy." : "Upgrade checkout was cancelled.",
+          "info"
+        );
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, [lang]);
+
   const handleToggleLang = () => {
     const nextLang = lang === "vi" ? "en" : "vi";
     setLang(nextLang);
@@ -185,16 +228,20 @@ export function DashboardClient({
   };
 
   const handleUpgradeToPro = async () => {
-    const updatedProfile = { ...profile, plan: "pro" as const };
-    setProfileState(updatedProfile);
-    setShowUpgradeModal(false);
-    showNotification(
-      lang === "vi"
-        ? "Chúc mừng! Bạn đã nâng cấp thành công lên gói Pro. Giới hạn đã được gỡ bỏ!"
-        : "Congratulations! You have upgraded to the Pro plan. All limits removed!",
-      "success"
-    );
-    await syncProfileToServer(updatedProfile);
+    setLoading(true);
+    try {
+      const res = await createCheckoutSessionAction();
+      if (res.data) {
+        setShowUpgradeModal(false);
+        window.location.href = res.data;
+      } else {
+        showNotification(res.error || "Failed to initiate payment.", "error");
+      }
+    } catch (err: any) {
+      showNotification(err.message || "Failed to initiate payment.", "error");
+    } finally {
+      setLoading(false);
+    }
   };
   const [showNewProfileModal, setShowNewProfileModal] = useState(false);
   const [newProfileName, setNewProfileName] = useState("");

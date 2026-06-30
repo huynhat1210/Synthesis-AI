@@ -367,3 +367,32 @@ export async function readPitchPublic(id: string): Promise<(SavedPitch & { creat
     return null;
   }
 }
+
+/** Updates the active default profile's plan field to 'pro' in the database. */
+export async function upgradeProfileToPro(userId: string): Promise<MasterProfile | null> {
+  try {
+    const activeProfile = await prisma.masterProfile.findFirst({
+      where: { userId, isDefault: true },
+    });
+    if (!activeProfile) return null;
+    const updated = await prisma.masterProfile.update({
+      where: { id: activeProfile.id },
+      data: { plan: "pro" },
+    });
+    return {
+      id: updated.id,
+      profileName: updated.profileName,
+      isDefault: updated.isDefault,
+      fullName: updated.fullName,
+      jobTitle: updated.jobTitle,
+      bio: updated.bio,
+      skills: updated.skills,
+      plan: "pro",
+      projects: [],
+    };
+  } catch (err) {
+    console.error("[PostgreSQL] Error in upgradeProfileToPro:", err);
+    return null;
+  }
+}
+

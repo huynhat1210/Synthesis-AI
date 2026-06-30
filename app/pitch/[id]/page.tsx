@@ -45,7 +45,7 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
             <img
               src="/favicon.png"
               alt="Synthesis AI Logo"
-              className="w-6 h-6 rounded object-contain bg-white/5 p-0.5 border border-white/10"
+              className="w-6 h-6 object-contain brightness-0 invert opacity-80"
             />
             <span className="text-sm font-bold font-geist tracking-wider uppercase text-gray-300">
               Synthesis Portal
@@ -65,7 +65,7 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
               <span className="text-xs text-secondary-container uppercase font-bold tracking-widest">
                 Optimized Proposal for {data.context.targetAudience}
               </span>
-              <h1 className="text-3xl md:text-4xl font-serif text-white font-bold leading-tight">
+              <h1 className="text-3xl md:text-4xl font-geist text-white font-black leading-tight tracking-tight">
                 {data.pitch.scenarioA.title}
               </h1>
               <p className="text-base text-gray-300 leading-relaxed">

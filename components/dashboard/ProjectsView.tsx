@@ -1,11 +1,13 @@
 /**
  * @file components/dashboard/ProjectsView.tsx
  * @description Renders the featured projects management tab.
+ *              Displays projects as clean text-based cards (no images) with tech stack,
+ *              role details, challenge descriptions, and impact metrics.
  */
 "use client";
 
 import React from "react";
-import { Plus, Edit2, Trash2 } from "lucide-react";
+import { Plus, Edit2, Trash2, Code, Briefcase, AlertCircle, CheckCircle } from "lucide-react";
 import { motion } from "motion/react";
 import type { MasterProfile, Project } from "@/types";
 
@@ -16,6 +18,14 @@ interface ProjectsViewProps {
   setProjectTitle: (val: string) => void;
   projectDesc: string;
   setProjectDesc: (val: string) => void;
+  projectRole: string;
+  setProjectRole: (val: string) => void;
+  projectChallenge: string;
+  setProjectChallenge: (val: string) => void;
+  projectTags: string;
+  setProjectTags: (val: string) => void;
+  projectOutcome: string;
+  setProjectOutcome: (val: string) => void;
   openProjectModal: (proj?: Project) => void;
   handleSaveProject: () => void;
   handleDeleteProject: (id: string) => void;
@@ -30,11 +40,18 @@ export function ProjectsView({
   setProjectTitle,
   projectDesc,
   setProjectDesc,
+  projectRole,
+  setProjectRole,
+  projectChallenge,
+  setProjectChallenge,
+  projectTags,
+  setProjectTags,
+  projectOutcome,
+  setProjectOutcome,
   openProjectModal,
   handleSaveProject,
   handleDeleteProject,
   setEditingProject,
-  mockImages,
 }: ProjectsViewProps) {
   return (
     <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm space-y-6 animate-fade-in">
@@ -47,7 +64,7 @@ export function ProjectsView({
         </div>
         <button
           onClick={() => openProjectModal()}
-          className="bg-secondary text-on-secondary px-4 py-2.5 rounded-lg text-xs font-bold flex items-center gap-1.5 hover:shadow-sm"
+          className="bg-secondary text-on-secondary px-4 py-2.5 rounded-lg text-xs font-bold flex items-center gap-1.5 hover:shadow-sm transition-all active:scale-95 cursor-pointer"
         >
           <Plus className="w-4 h-4" /> Add Project
         </button>
@@ -59,12 +76,13 @@ export function ProjectsView({
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
-          className="bg-surface border border-outline-variant rounded-xl p-5 space-y-4 overflow-hidden"
+          className="bg-surface border border-outline-variant rounded-xl p-5 space-y-4 overflow-hidden text-left"
         >
           <h3 className="text-sm font-bold text-primary flex items-center gap-1.5">
             <Edit2 className="w-4 h-4" />
             {editingProject.id ? "Edit Project Details" : "Add New Featured Project"}
           </h3>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-primary mb-1">
@@ -80,27 +98,80 @@ export function ProjectsView({
             </div>
             <div>
               <label className="block text-xs font-semibold text-primary mb-1">
-                Impact & Core Result Summary
+                Your Role
               </label>
               <input
                 type="text"
-                value={projectDesc}
-                onChange={(e) => setProjectDesc(e.target.value)}
-                placeholder="e.g. Redesigned customer journey decreasing churn rate by 22%."
+                value={projectRole}
+                onChange={(e) => setProjectRole(e.target.value)}
+                placeholder="e.g. Lead Architect, Senior Developer"
                 className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-2.5 text-xs focus:border-secondary outline-none"
               />
             </div>
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-primary mb-1">
+                Tech Stack & Tools (comma-separated)
+              </label>
+              <input
+                type="text"
+                value={projectTags}
+                onChange={(e) => setProjectTags(e.target.value)}
+                placeholder="e.g. Next.js, TypeScript, PostgreSQL, AWS"
+                className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-2.5 text-xs focus:border-secondary outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-primary mb-1">
+                Impact / Core Metric Result
+              </label>
+              <input
+                type="text"
+                value={projectOutcome}
+                onChange={(e) => setProjectOutcome(e.target.value)}
+                placeholder="e.g. Reduced loading times by 40% and improved security by 99%."
+                className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-2.5 text-xs focus:border-secondary outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-primary mb-1">
+              Project Description / Outcome Details
+            </label>
+            <input
+              type="text"
+              value={projectDesc}
+              onChange={(e) => setProjectDesc(e.target.value)}
+              placeholder="Provide a general summary of the project architecture and what was built..."
+              className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-2.5 text-xs focus:border-secondary outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-primary mb-1">
+              The Challenge / Problem Solved (Optional)
+            </label>
+            <textarea
+              value={projectChallenge}
+              onChange={(e) => setProjectChallenge(e.target.value)}
+              placeholder="What was the client's problem or system bottleneck before starting? e.g. System experiencing heavy latency..."
+              className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-2.5 text-xs focus:border-secondary outline-none h-20 resize-none"
+            />
+          </div>
+
           <div className="flex gap-2 justify-end pt-2">
             <button
               onClick={() => setEditingProject(null)}
-              className="px-3.5 py-2 border border-outline text-primary rounded-lg text-xs font-semibold"
+              className="px-3.5 py-2 border border-outline text-primary rounded-lg text-xs font-semibold hover:bg-surface-container-low transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               onClick={handleSaveProject}
-              className="px-3.5 py-2 bg-secondary text-on-secondary rounded-lg text-xs font-semibold"
+              className="px-3.5 py-2 bg-secondary text-on-secondary rounded-lg text-xs font-bold hover:shadow-sm cursor-pointer"
             >
               Save Project
             </button>
@@ -108,45 +179,93 @@ export function ProjectsView({
         </motion.div>
       )}
 
-      {/* Projects Grid */}
+      {/* Projects List Grid (Clean Flat Design - No Images) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {profile.projects.map((proj) => (
           <div
             key={proj.id}
-            className="border border-outline-variant rounded-xl overflow-hidden bg-surface hover:shadow-sm transition-all flex flex-col justify-between h-72 animate-fade-in"
+            className="border border-outline-variant rounded-xl p-5 bg-surface-container-lowest hover:shadow-md transition-all flex flex-col justify-between min-h-[220px] hover:border-secondary/35 group relative text-left"
           >
-            <div>
-              <div className="relative h-40 bg-gray-200">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={proj.image || mockImages[0]}
-                  alt={proj.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-3 right-3 flex gap-2">
+            <div className="space-y-3">
+              {/* Header: Title, Role and Action buttons */}
+              <div className="flex justify-between items-start gap-4">
+                <div className="space-y-1 min-w-0">
+                  <h3 className="text-sm font-black text-primary leading-tight truncate">{proj.title}</h3>
+                  {proj.role && (
+                    <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-secondary bg-secondary/10 px-2 py-0.5 rounded-md">
+                      <Briefcase className="w-2.5 h-2.5" />
+                      {proj.role}
+                    </span>
+                  )}
+                </div>
+                
+                <div className="flex gap-1.5 shrink-0">
                   <button
                     onClick={() => openProjectModal(proj)}
-                    className="bg-surface-container-lowest p-2 rounded-full border border-outline-variant shadow text-primary hover:text-secondary transition-colors"
+                    className="p-1.5 rounded-full border border-outline-variant bg-surface text-primary hover:bg-secondary/10 hover:text-secondary transition-colors cursor-pointer"
+                    title="Edit project"
                   >
-                    <Edit2 className="w-3.5 h-3.5" />
+                    <Edit2 className="w-3 h-3" />
                   </button>
                   <button
                     onClick={() => handleDeleteProject(proj.id)}
-                    className="bg-surface-container-lowest p-2 rounded-full border border-outline-variant shadow text-on-surface-variant hover:text-error transition-colors"
+                    className="p-1.5 rounded-full border border-outline-variant bg-surface text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors cursor-pointer"
+                    title="Delete project"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-3 h-3" />
                   </button>
                 </div>
               </div>
-              <div className="p-4">
-                <h3 className="text-sm font-bold text-primary mb-1.5">{proj.title}</h3>
-                <p className="text-xs text-on-surface-variant leading-relaxed line-clamp-3">
+
+              {/* Tech Stack Tags */}
+              {proj.tags && proj.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {proj.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="bg-surface-container-low text-on-surface-variant text-[8px] font-extrabold uppercase px-2 py-0.5 rounded border border-outline-variant/30 flex items-center gap-1"
+                    >
+                      <Code className="w-2 h-2 text-outline" />
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Description */}
+              <div className="space-y-2">
+                <p className="text-[11px] text-on-surface-variant leading-relaxed line-clamp-2">
                   {proj.description}
                 </p>
+                
+                {/* Challenge section if available */}
+                {proj.challenge && (
+                  <div className="text-[10px] bg-slate-50 p-2 rounded-md border border-slate-100 flex items-start gap-1.5">
+                    <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <span className="font-bold text-[9px] text-slate-500 uppercase block leading-none mb-1">Challenge:</span>
+                      <p className="text-[10px] text-slate-600 leading-normal line-clamp-2">{proj.challenge}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
+
+            {/* Impact Metric result outcome */}
+            {proj.outcome && (
+              <div className="mt-3 pt-3 border-t border-outline-variant/50">
+                <div className="flex items-start gap-2 bg-emerald-50 text-emerald-800 text-[10px] p-2 rounded-lg border border-emerald-100 leading-normal">
+                  <CheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-extrabold text-[8px] text-emerald-700 uppercase block leading-none mb-0.5">Impact Result:</span>
+                    <p className="font-medium text-emerald-900">{proj.outcome}</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         ))}
+
         {profile.projects.length === 0 && (
           <div className="col-span-2 text-center py-12 border-2 border-dashed border-outline-variant rounded-xl text-sm text-on-surface-variant">
             No projects in profile. Add your first project above to serve as a stellar proof point!

@@ -26,6 +26,11 @@ export const metadata: Metadata = {
   description:
     "Generate hyper-personalised professional pitches powered by Google Gemini AI. One Master Profile, infinite contexts.",
   keywords: ["pitch generator", "AI", "Gemini", "sales", "freelance", "context-aware"],
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
   openGraph: {
     title: "Synthesis AI",
     description: "AI-powered pitch generator for professionals",

@@ -7,6 +7,7 @@
 
 import { Sparkles, Zap, ChevronRight, CheckCircle, Check, Copy, Share2, TrendingUp, X, RefreshCw, FileUp, FileDown, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
 import type { MasterProfile, ClientContext, GeneratedPitch } from "@/types";
 
 interface DashboardViewProps {
@@ -160,7 +161,12 @@ ${currentResult.scenarioB.content}
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Build Master Profile */}
-        <div className="lg:col-span-7 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
+        <motion.div
+          initial={{ opacity: 0, x: -25 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}
+          className="lg:col-span-7 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm relative"
+        >
           <div className="border-b border-outline-variant pb-4 mb-6">
             <h3 className="text-lg font-bold font-geist text-primary uppercase">
               BUILD YOUR MASTER PROFILE
@@ -297,10 +303,15 @@ ${currentResult.scenarioB.content}
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right Column: Generate Pitch Configuration */}
-        <div className="lg:col-span-5 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm relative overflow-hidden flex flex-col justify-between">
+        <motion.div
+          initial={{ opacity: 0, x: 25 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.05 }}
+          className="lg:col-span-5 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm relative overflow-hidden flex flex-col justify-between"
+        >
           <div className="absolute top-0 left-0 w-full h-1.5 bg-secondary"></div>
 
           <div>
@@ -329,12 +340,23 @@ ${currentResult.scenarioB.content}
                     />
                   </label>
                 </div>
-                <textarea
-                  value={inputs.targetAudience}
-                  onChange={(e) => setInputs({ ...inputs, targetAudience: e.target.value })}
-                  className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 text-sm focus:border-secondary focus:ring-2 focus:ring-secondary/10 outline-none transition-all h-32 resize-none leading-relaxed"
-                  placeholder="Describe who you are pitching to or upload a Job Description PDF above..."
-                />
+                <div className="relative overflow-hidden rounded-lg">
+                  <textarea
+                    value={inputs.targetAudience}
+                    onChange={(e) => setInputs({ ...inputs, targetAudience: e.target.value })}
+                    className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 text-sm focus:border-secondary focus:ring-2 focus:ring-secondary/10 outline-none transition-all h-32 resize-none leading-relaxed"
+                    placeholder="Describe who you are pitching to or upload a Job Description PDF above..."
+                  />
+                  {parsingPdf && (
+                    <div className="absolute inset-0 bg-surface/85 backdrop-blur-[1px] flex flex-col justify-center items-center rounded-lg z-10 overflow-hidden border border-secondary/20">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-secondary shadow-[0_0_10px_#006b5f] animate-scan"></div>
+                      <div className="flex items-center gap-2.5 text-secondary font-bold text-xs tracking-wider uppercase animate-pulse">
+                        <div className="w-3.5 h-3.5 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div>
+                        <span>AI is Scanning PDF...</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
@@ -464,11 +486,16 @@ ${currentResult.scenarioB.content}
               GENERATE DYNAMIC PITCH
             </button>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Live Pitch Preview Panel */}
-      <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.1 }}
+        className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm"
+      >
         <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-outline-variant pb-4 mb-6 gap-3">
           <div>
             <h3 className="text-lg font-bold font-geist text-primary uppercase">
@@ -664,7 +691,7 @@ ${currentResult.scenarioB.content}
             </div>
           </>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

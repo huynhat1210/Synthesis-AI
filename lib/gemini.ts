@@ -252,7 +252,7 @@ ${
     ? profile.projects
         .map(
           (p) =>
-            `  • ${p.title}: ${p.description}${p.outcome ? ` (${p.outcome})` : ""}`
+            `  • ${p.title}:\n    - Role: ${p.role || "Not specified"}\n    - Bio/Context: ${p.description}\n${p.challenge ? `    - Challenge: ${p.challenge}\n` : ""}${p.outcome ? `    - Outcome/Metrics: ${p.outcome}\n` : ""}`
         )
         .join("\n")
     : "  None provided"

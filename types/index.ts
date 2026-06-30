@@ -13,6 +13,8 @@ export interface Project {
   id: string;
   title: string;
   description: string;
+  role?: string;
+  challenge?: string;
   image?: string;
   tags?: string[];
   outcome?: string;

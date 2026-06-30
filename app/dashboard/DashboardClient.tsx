@@ -237,6 +237,10 @@ export function DashboardClient({
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [projectTitle, setProjectTitle] = useState("");
   const [projectDesc, setProjectDesc] = useState("");
+  const [projectRole, setProjectRole] = useState("");
+  const [projectChallenge, setProjectChallenge] = useState("");
+  const [projectTags, setProjectTags] = useState("");
+  const [projectOutcome, setProjectOutcome] = useState("");
 
   // Auto dismiss Toast alert
   useEffect(() => {
@@ -360,10 +364,18 @@ export function DashboardClient({
       setEditingProject(proj);
       setProjectTitle(proj.title);
       setProjectDesc(proj.description);
+      setProjectRole(proj.role || "");
+      setProjectChallenge(proj.challenge || "");
+      setProjectTags(proj.tags ? proj.tags.join(", ") : "");
+      setProjectOutcome(proj.outcome || "");
     } else {
       setEditingProject({ id: "", title: "", description: "" });
       setProjectTitle("");
       setProjectDesc("");
+      setProjectRole("");
+      setProjectChallenge("");
+      setProjectTags("");
+      setProjectOutcome("");
     }
   };
 
@@ -371,10 +383,20 @@ export function DashboardClient({
     if (!projectTitle.trim() || !projectDesc.trim()) return;
 
     let updatedProjects = [...profile.projects];
+    const tagsArray = projectTags.split(",").map((t) => t.trim()).filter((t) => t !== "");
+
     if (editingProject && editingProject.id) {
       updatedProjects = profile.projects.map((p) =>
         p.id === editingProject.id
-          ? { ...p, title: projectTitle, description: projectDesc }
+          ? {
+              ...p,
+              title: projectTitle,
+              description: projectDesc,
+              role: projectRole,
+              challenge: projectChallenge,
+              tags: tagsArray,
+              outcome: projectOutcome,
+            }
           : p
       );
       showNotification("Project updated successfully!");
@@ -383,7 +405,10 @@ export function DashboardClient({
         id: Date.now().toString(),
         title: projectTitle,
         description: projectDesc,
-        image: MOCK_IMAGES[profile.projects.length % MOCK_IMAGES.length],
+        role: projectRole,
+        challenge: projectChallenge,
+        tags: tagsArray,
+        outcome: projectOutcome,
       };
       updatedProjects.push(newProj);
       showNotification("New project added to profile!");
@@ -746,12 +771,6 @@ export function DashboardClient({
         <header className="h-16 w-full flex justify-between items-center px-6 border-b border-outline-variant bg-surface-container-lowest sticky top-0 z-10 shrink-0">
           <div className="flex items-center gap-3 w-1/2">
             <Link href="/" className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/favicon.png"
-                alt="PitchPerfect Logo"
-                className="w-7 h-7 rounded object-contain bg-surface-container-low p-0.5 border border-outline-variant"
-              />
               <h1 className="text-lg font-bold font-geist text-primary tracking-tight">
                 PitchPerfect
               </h1>
@@ -798,7 +817,7 @@ export function DashboardClient({
                 className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors active:scale-95 cursor-pointer relative"
                 title="Notifications"
               >
-                <Bell className="w-5 h-5 text-outline" />
+                <Bell className={`w-5 h-5 text-outline origin-top ${unreadNotifications ? "animate-jiggle" : ""}`} />
                 {unreadNotifications && (
                   <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
                 )}
@@ -955,6 +974,14 @@ export function DashboardClient({
                   setProjectTitle={setProjectTitle}
                   projectDesc={projectDesc}
                   setProjectDesc={setProjectDesc}
+                  projectRole={projectRole}
+                  setProjectRole={setProjectRole}
+                  projectChallenge={projectChallenge}
+                  setProjectChallenge={setProjectChallenge}
+                  projectTags={projectTags}
+                  setProjectTags={setProjectTags}
+                  projectOutcome={projectOutcome}
+                  setProjectOutcome={setProjectOutcome}
                   openProjectModal={openProjectModal}
                   handleSaveProject={handleSaveProject}
                   handleDeleteProject={handleDeleteProject}

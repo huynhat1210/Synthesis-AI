@@ -1,18 +1,18 @@
 /**
  * @file app/pitch/[id]/PitchActions.tsx
  * @description Client component — action buttons for the public pitch page.
- *              Handles PDF export with a clean, professional layout.
+ *              Handles PDF export with a clean, professional layout including
+ *              the full Master Profile (About Me, Skills, Projects).
  */
 "use client";
 
 import React, { useState } from "react";
 import { FileDown, Copy, Check } from "lucide-react";
-import type { SavedPitch } from "@/types";
+import type { SavedPitch, MasterProfile } from "@/types";
 
 interface PitchActionsProps {
   pitch: SavedPitch;
-  profileFullName: string;
-  profileJobTitle: string;
+  profile: MasterProfile;
 }
 
 /**
@@ -33,7 +33,7 @@ function sanitize(text: string): string {
     .trim();
 }
 
-export function PitchActions({ pitch, profileFullName, profileJobTitle }: PitchActionsProps) {
+export function PitchActions({ pitch, profile }: PitchActionsProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = () => {
@@ -46,8 +46,8 @@ export function PitchActions({ pitch, profileFullName, profileJobTitle }: PitchA
     const p = pitch.pitch;
     const ctx = pitch.context;
 
-    const fullName = sanitize(profileFullName);
-    const jobTitle  = sanitize(profileJobTitle);
+    const fullName = sanitize(profile.fullName);
+    const jobTitle  = sanitize(profile.jobTitle);
 
     const dateStr = new Date(pitch.createdAt).toLocaleDateString("en-GB", {
       day: "2-digit",
@@ -77,6 +77,32 @@ export function PitchActions({ pitch, profileFullName, profileJobTitle }: PitchA
               .map((s) => `<div class="stat">${sanitize(s.label)}</div>`)
               .join("")}
           </div>`
+        : "";
+
+    /* ── Profile Skills HTML ── */
+    const skillsHtml =
+      profile.skills && profile.skills.length > 0
+        ? profile.skills
+            .map((s) => `<span class="pdf-skill-tag">${sanitize(s)}</span>`)
+            .join("")
+        : "";
+
+    /* ── Profile Projects HTML ── */
+    const projectsHtml =
+      profile.projects && profile.projects.length > 0
+        ? profile.projects
+            .map(
+              (proj) =>
+                `<div class="pdf-project-card">
+                  <h4 class="pdf-project-title">${sanitize(proj.title)}</h4>
+                  <div class="pdf-project-meta">
+                    ${proj.role ? `<span><strong>Role:</strong> ${sanitize(proj.role)}</span>` : ""}
+                    ${proj.outcome ? `<span><strong>Result:</strong> ${sanitize(proj.outcome)}</span>` : ""}
+                  </div>
+                  <p class="pdf-project-desc">${sanitize(proj.description)}</p>
+                </div>`
+            )
+            .join("")
         : "";
 
     const htmlContent = `<!DOCTYPE html>
@@ -287,6 +313,57 @@ html,body{
   font-weight: 500;
 }
 
+/* ─── PROFILE SKILLS & PROJECTS ─── */
+.pdf-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.pdf-skill-tag {
+  font-size: 10.5px;
+  font-weight: 600;
+  background: #f1f3f5;
+  border: 1px solid #e9ecef;
+  color: #495057;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+.pdf-projects {
+  margin-top: 10px;
+}
+.pdf-project-card {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  page-break-inside: avoid;
+}
+.pdf-project-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.pdf-project-meta {
+  font-size: 10px;
+  color: #6c757d;
+  margin: 3px 0 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.pdf-project-meta strong {
+  color: #495057;
+}
+.pdf-project-desc {
+  font-size: 11.5px;
+  color: #495057;
+  line-height: 1.6;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
 /* ─── FOOTER ─── */
 .footer{
   margin-top: 48px;
@@ -331,7 +408,7 @@ html,body{
     </div>
   </div>
 
-  <!-- Profile -->
+  <!-- Profile Header Card -->
   <div class="profile section">
     <div class="avatar">${fullName.slice(0,1).toUpperCase()}</div>
     <div>
@@ -361,6 +438,32 @@ html,body{
     <div class="scenb-title">${sanitize(p.scenarioB.title)}</div>
     <div class="scenb-body">${sanitize(p.scenarioB.content)}</div>
     ${statsHtml}
+  </div>
+
+  <!-- Professional Profile Details Section -->
+  <div class="section" style="margin-top: 36px;">
+    <hr class="rule"/>
+    <span class="label" style="margin-bottom: 16px;">Professional Biography &amp; Profile Details</span>
+    
+    <!-- About Me / Bio -->
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #495057; margin-bottom: 6px; letter-spacing: 1px;">About Me</h3>
+      <p class="body" style="margin-bottom: 0;">${sanitize(profile.bio)}</p>
+    </div>
+
+    <!-- Skills -->
+    ${skillsHtml ? `
+    <div style="margin-bottom: 24px; page-break-inside: avoid;">
+      <h3 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #495057; margin-bottom: 8px; letter-spacing: 1px;">Core Capabilities</h3>
+      <div class="pdf-skills">${skillsHtml}</div>
+    </div>` : ""}
+
+    <!-- Projects -->
+    ${projectsHtml ? `
+    <div style="margin-bottom: 0; page-break-inside: avoid;">
+      <h3 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #495057; margin-bottom: 10px; letter-spacing: 1px;">Portfolio Proof Points</h3>
+      <div class="pdf-projects">${projectsHtml}</div>
+    </div>` : ""}
   </div>
 
   <!-- Footer -->

@@ -59,8 +59,7 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
             {/* ── Download & Copy Actions ── */}
             <PitchActions
               pitch={data}
-              profileFullName={profile.fullName}
-              profileJobTitle={profile.jobTitle}
+              profile={profile}
             />
           </div>
         </header>
@@ -132,8 +131,7 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
             <div className="flex justify-center lg:hidden pt-4">
               <PitchActions
                 pitch={data}
-                profileFullName={profile.fullName}
-                profileJobTitle={profile.jobTitle}
+                profile={profile}
               />
             </div>
           </div>

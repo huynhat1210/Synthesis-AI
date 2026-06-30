@@ -29,6 +29,7 @@ export async function readAllProfiles(userId: string): Promise<MasterProfile[]> 
       bio: p.bio,
       skills: p.skills,
       projects: [], // Projects are loaded on demand for the active profile
+      plan: p.plan as "free" | "pro",
     }));
   } catch (err) {
     console.error(`[PostgreSQL] Error in readAllProfiles for user ${userId}:`, err);
@@ -54,6 +55,7 @@ export async function readProfile(userId: string, profileId?: string): Promise<M
         jobTitle: profile.jobTitle,
         bio: profile.bio,
         skills: profile.skills,
+        plan: profile.plan as "free" | "pro",
         projects: profile.projects.map((p) => ({
           id: p.id,
           title: p.title,
@@ -88,6 +90,7 @@ export async function readProfile(userId: string, profileId?: string): Promise<M
       bio: "",
       skills: [],
       projects: [],
+      plan: "free",
     };
   } catch (err) {
     console.error(`[PostgreSQL] Error in readProfile for user ${userId}:`, err);
@@ -123,6 +126,7 @@ export async function createNewProfile(userId: string, name: string): Promise<Ma
       bio: "",
       skills: [],
       projects: [],
+      plan: "free",
     };
   } catch (err) {
     console.error(`[PostgreSQL] Error in createNewProfile:`, err);
@@ -163,6 +167,7 @@ export async function writeProfile(userId: string, profile: MasterProfile): Prom
           bio: profile.bio,
           skills: profile.skills,
           profileName: profile.profileName || "Profile",
+          plan: profile.plan || "free",
         },
         create: {
           userId,
@@ -172,6 +177,7 @@ export async function writeProfile(userId: string, profile: MasterProfile): Prom
           skills: profile.skills,
           profileName: profile.profileName || "Profile",
           isDefault: profile.isDefault ?? false,
+          plan: profile.plan || "free",
         },
       });
 

@@ -29,6 +29,7 @@ import {
   Target,
   AlertCircle,
   Info,
+  Check,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { UserButton } from "@clerk/nextjs";
@@ -159,6 +160,7 @@ export function DashboardClient({
 
   // ── Reset Confirmation Modal state ───────────────────────────────────
   const [showResetModal, setShowResetModal] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const handleConfirmReset = async () => {
     const defaults: MasterProfile = {
@@ -178,6 +180,19 @@ export function DashboardClient({
     setShowResetModal(false);
     showNotification(lang === "vi" ? "Đã đặt lại ứng dụng về mặc định!" : "Application state has been reset!", "success");
     await syncProfileToServer(defaults);
+  };
+
+  const handleUpgradeToPro = async () => {
+    const updatedProfile = { ...profile, plan: "pro" as const };
+    setProfileState(updatedProfile);
+    setShowUpgradeModal(false);
+    showNotification(
+      lang === "vi"
+        ? "Chúc mừng! Bạn đã nâng cấp thành công lên gói Pro. Giới hạn đã được gỡ bỏ!"
+        : "Congratulations! You have upgraded to the Pro plan. All limits removed!",
+      "success"
+    );
+    await syncProfileToServer(updatedProfile);
   };
   const [showNewProfileModal, setShowNewProfileModal] = useState(false);
   const [newProfileName, setNewProfileName] = useState("");
@@ -487,6 +502,12 @@ export function DashboardClient({
   const handleGeneratePitch = async () => {
     if (!inputs.targetAudience.trim()) {
       showNotification(lang === "vi" ? "Vui lòng mô tả khách hàng mục tiêu." : "Please state your target audience.", "info");
+      return;
+    }
+
+    const isPro = profile.plan === "pro";
+    if (!isPro && savedPitches.length >= 10) {
+      setShowUpgradeModal(true);
       return;
     }
 
@@ -833,6 +854,82 @@ export function DashboardClient({
                   ) : (
                     <>{lang === "vi" ? "✓ Tạo hồ sơ" : "✓ Create Profile"}</>
                   )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Pro Upgrade Subscription Modal ── */}
+      <AnimatePresence>
+        {showUpgradeModal && (
+          <motion.div
+            key="upgrade-modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+            onClick={(e) => { if (e.target === e.currentTarget) setShowUpgradeModal(false); }}
+          >
+            <motion.div
+              key="upgrade-modal"
+              initial={{ opacity: 0, scale: 0.92, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 16 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-surface-container-lowest border border-outline-variant rounded-2xl shadow-2xl w-full max-w-md p-6 text-left"
+            >
+              {/* Icon + Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-secondary/10 border border-secondary/20 flex items-center justify-center shrink-0">
+                  <Zap className="w-5 h-5 text-secondary animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-primary font-geist uppercase">
+                    {lang === "vi" ? "Nâng cấp lên gói Pro" : "Upgrade to Pro"}
+                  </h3>
+                  <p className="text-xs text-on-surface-variant font-semibold">
+                    {lang === "vi" ? "Vượt qua giới hạn 10 bản Pitch / tháng" : "Bypass the 10 pitches / month limit"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Benefits list */}
+              <div className="bg-surface rounded-xl p-4 mb-5 border border-outline-variant/60">
+                <p className="text-xs text-primary font-bold mb-3">
+                  {lang === "vi" ? "Quyền lợi thành viên Pro:" : "Pro Member Benefits:"}
+                </p>
+                <ul className="space-y-2.5">
+                  {[
+                    lang === "vi" ? "Không giới hạn lượt tạo Pitch bằng AI" : "Unlimited AI-powered pitch generation",
+                    lang === "vi" ? "Tự động trích xuất kỹ năng nâng cao từ JD" : "Extract advanced capabilities directly from JDs",
+                    lang === "vi" ? "Mở khóa toàn bộ chỉ số phân tích độ tương thích" : "Unlock complete match compatibility analytics",
+                    lang === "vi" ? "Hỗ trợ xuất bản đề xuất PDF 2 cột cao cấp" : "Premium 2-column print-ready PDF exports",
+                  ].map((benefit, i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-xs text-on-surface-variant">
+                      <Check className="w-4 h-4 text-secondary shrink-0 mt-0.5" />
+                      <span>{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowUpgradeModal(false)}
+                  className="flex-1 px-4 py-2.5 border border-outline text-primary rounded-xl text-sm font-semibold hover:bg-surface-container-low transition-colors cursor-pointer"
+                >
+                  {lang === "vi" ? "Hủy bỏ" : "Cancel"}
+                </button>
+                <button
+                  onClick={handleUpgradeToPro}
+                  className="flex-1 px-4 py-2.5 bg-secondary text-on-secondary rounded-xl text-sm font-bold hover:bg-secondary/90 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-secondary/10"
+                >
+                  <Zap className="w-3.5 h-3.5 fill-current" />
+                  {lang === "vi" ? "Nâng cấp ngay" : "Upgrade Now"}
                 </button>
               </div>
             </motion.div>

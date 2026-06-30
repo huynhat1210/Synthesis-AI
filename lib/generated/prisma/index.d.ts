@@ -1072,6 +1072,7 @@ export namespace Prisma {
     fullName: string | null
     jobTitle: string | null
     bio: string | null
+    plan: string | null
   }
 
   export type MasterProfileMaxAggregateOutputType = {
@@ -1082,6 +1083,7 @@ export namespace Prisma {
     fullName: string | null
     jobTitle: string | null
     bio: string | null
+    plan: string | null
   }
 
   export type MasterProfileCountAggregateOutputType = {
@@ -1093,6 +1095,7 @@ export namespace Prisma {
     jobTitle: number
     bio: number
     skills: number
+    plan: number
     _all: number
   }
 
@@ -1105,6 +1108,7 @@ export namespace Prisma {
     fullName?: true
     jobTitle?: true
     bio?: true
+    plan?: true
   }
 
   export type MasterProfileMaxAggregateInputType = {
@@ -1115,6 +1119,7 @@ export namespace Prisma {
     fullName?: true
     jobTitle?: true
     bio?: true
+    plan?: true
   }
 
   export type MasterProfileCountAggregateInputType = {
@@ -1126,6 +1131,7 @@ export namespace Prisma {
     jobTitle?: true
     bio?: true
     skills?: true
+    plan?: true
     _all?: true
   }
 
@@ -1210,6 +1216,7 @@ export namespace Prisma {
     jobTitle: string
     bio: string
     skills: string[]
+    plan: string
     _count: MasterProfileCountAggregateOutputType | null
     _min: MasterProfileMinAggregateOutputType | null
     _max: MasterProfileMaxAggregateOutputType | null
@@ -1238,6 +1245,7 @@ export namespace Prisma {
     jobTitle?: boolean
     bio?: boolean
     skills?: boolean
+    plan?: boolean
     projects?: boolean | MasterProfile$projectsArgs<ExtArgs>
     pitches?: boolean | MasterProfile$pitchesArgs<ExtArgs>
     _count?: boolean | MasterProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -1252,6 +1260,7 @@ export namespace Prisma {
     jobTitle?: boolean
     bio?: boolean
     skills?: boolean
+    plan?: boolean
   }, ExtArgs["result"]["masterProfile"]>
 
   export type MasterProfileSelectScalar = {
@@ -1263,6 +1272,7 @@ export namespace Prisma {
     jobTitle?: boolean
     bio?: boolean
     skills?: boolean
+    plan?: boolean
   }
 
   export type MasterProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1287,6 +1297,7 @@ export namespace Prisma {
       jobTitle: string
       bio: string
       skills: string[]
+      plan: string
     }, ExtArgs["result"]["masterProfile"]>
     composites: {}
   }
@@ -1690,6 +1701,7 @@ export namespace Prisma {
     readonly jobTitle: FieldRef<"MasterProfile", 'String'>
     readonly bio: FieldRef<"MasterProfile", 'String'>
     readonly skills: FieldRef<"MasterProfile", 'String[]'>
+    readonly plan: FieldRef<"MasterProfile", 'String'>
   }
     
 
@@ -4040,7 +4052,8 @@ export namespace Prisma {
     fullName: 'fullName',
     jobTitle: 'jobTitle',
     bio: 'bio',
-    skills: 'skills'
+    skills: 'skills',
+    plan: 'plan'
   };
 
   export type MasterProfileScalarFieldEnum = (typeof MasterProfileScalarFieldEnum)[keyof typeof MasterProfileScalarFieldEnum]
@@ -4204,6 +4217,7 @@ export namespace Prisma {
     jobTitle?: StringFilter<"MasterProfile"> | string
     bio?: StringFilter<"MasterProfile"> | string
     skills?: StringNullableListFilter<"MasterProfile">
+    plan?: StringFilter<"MasterProfile"> | string
     projects?: ProjectListRelationFilter
     pitches?: SavedPitchListRelationFilter
   }
@@ -4217,6 +4231,7 @@ export namespace Prisma {
     jobTitle?: SortOrder
     bio?: SortOrder
     skills?: SortOrder
+    plan?: SortOrder
     projects?: ProjectOrderByRelationAggregateInput
     pitches?: SavedPitchOrderByRelationAggregateInput
   }
@@ -4233,6 +4248,7 @@ export namespace Prisma {
     jobTitle?: StringFilter<"MasterProfile"> | string
     bio?: StringFilter<"MasterProfile"> | string
     skills?: StringNullableListFilter<"MasterProfile">
+    plan?: StringFilter<"MasterProfile"> | string
     projects?: ProjectListRelationFilter
     pitches?: SavedPitchListRelationFilter
   }, "id">
@@ -4246,6 +4262,7 @@ export namespace Prisma {
     jobTitle?: SortOrder
     bio?: SortOrder
     skills?: SortOrder
+    plan?: SortOrder
     _count?: MasterProfileCountOrderByAggregateInput
     _max?: MasterProfileMaxOrderByAggregateInput
     _min?: MasterProfileMinOrderByAggregateInput
@@ -4263,6 +4280,7 @@ export namespace Prisma {
     jobTitle?: StringWithAggregatesFilter<"MasterProfile"> | string
     bio?: StringWithAggregatesFilter<"MasterProfile"> | string
     skills?: StringNullableListFilter<"MasterProfile">
+    plan?: StringWithAggregatesFilter<"MasterProfile"> | string
   }
 
   export type ProjectWhereInput = {
@@ -4416,6 +4434,7 @@ export namespace Prisma {
     jobTitle: string
     bio: string
     skills?: MasterProfileCreateskillsInput | string[]
+    plan?: string
     projects?: ProjectCreateNestedManyWithoutProfileInput
     pitches?: SavedPitchCreateNestedManyWithoutProfileInput
   }
@@ -4429,6 +4448,7 @@ export namespace Prisma {
     jobTitle: string
     bio: string
     skills?: MasterProfileCreateskillsInput | string[]
+    plan?: string
     projects?: ProjectUncheckedCreateNestedManyWithoutProfileInput
     pitches?: SavedPitchUncheckedCreateNestedManyWithoutProfileInput
   }
@@ -4442,6 +4462,7 @@ export namespace Prisma {
     jobTitle?: StringFieldUpdateOperationsInput | string
     bio?: StringFieldUpdateOperationsInput | string
     skills?: MasterProfileUpdateskillsInput | string[]
+    plan?: StringFieldUpdateOperationsInput | string
     projects?: ProjectUpdateManyWithoutProfileNestedInput
     pitches?: SavedPitchUpdateManyWithoutProfileNestedInput
   }
@@ -4455,6 +4476,7 @@ export namespace Prisma {
     jobTitle?: StringFieldUpdateOperationsInput | string
     bio?: StringFieldUpdateOperationsInput | string
     skills?: MasterProfileUpdateskillsInput | string[]
+    plan?: StringFieldUpdateOperationsInput | string
     projects?: ProjectUncheckedUpdateManyWithoutProfileNestedInput
     pitches?: SavedPitchUncheckedUpdateManyWithoutProfileNestedInput
   }
@@ -4468,6 +4490,7 @@ export namespace Prisma {
     jobTitle: string
     bio: string
     skills?: MasterProfileCreateskillsInput | string[]
+    plan?: string
   }
 
   export type MasterProfileUpdateManyMutationInput = {
@@ -4479,6 +4502,7 @@ export namespace Prisma {
     jobTitle?: StringFieldUpdateOperationsInput | string
     bio?: StringFieldUpdateOperationsInput | string
     skills?: MasterProfileUpdateskillsInput | string[]
+    plan?: StringFieldUpdateOperationsInput | string
   }
 
   export type MasterProfileUncheckedUpdateManyInput = {
@@ -4490,6 +4514,7 @@ export namespace Prisma {
     jobTitle?: StringFieldUpdateOperationsInput | string
     bio?: StringFieldUpdateOperationsInput | string
     skills?: MasterProfileUpdateskillsInput | string[]
+    plan?: StringFieldUpdateOperationsInput | string
   }
 
   export type ProjectCreateInput = {
@@ -4701,6 +4726,7 @@ export namespace Prisma {
     jobTitle?: SortOrder
     bio?: SortOrder
     skills?: SortOrder
+    plan?: SortOrder
   }
 
   export type MasterProfileMaxOrderByAggregateInput = {
@@ -4711,6 +4737,7 @@ export namespace Prisma {
     fullName?: SortOrder
     jobTitle?: SortOrder
     bio?: SortOrder
+    plan?: SortOrder
   }
 
   export type MasterProfileMinOrderByAggregateInput = {
@@ -4721,6 +4748,7 @@ export namespace Prisma {
     fullName?: SortOrder
     jobTitle?: SortOrder
     bio?: SortOrder
+    plan?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -5404,6 +5432,7 @@ export namespace Prisma {
     jobTitle: string
     bio: string
     skills?: MasterProfileCreateskillsInput | string[]
+    plan?: string
     pitches?: SavedPitchCreateNestedManyWithoutProfileInput
   }
 
@@ -5416,6 +5445,7 @@ export namespace Prisma {
     jobTitle: string
     bio: string
     skills?: MasterProfileCreateskillsInput | string[]
+    plan?: string
     pitches?: SavedPitchUncheckedCreateNestedManyWithoutProfileInput
   }
 
@@ -5444,6 +5474,7 @@ export namespace Prisma {
     jobTitle?: StringFieldUpdateOperationsInput | string
     bio?: StringFieldUpdateOperationsInput | string
     skills?: MasterProfileUpdateskillsInput | string[]
+    plan?: StringFieldUpdateOperationsInput | string
     pitches?: SavedPitchUpdateManyWithoutProfileNestedInput
   }
 
@@ -5456,6 +5487,7 @@ export namespace Prisma {
     jobTitle?: StringFieldUpdateOperationsInput | string
     bio?: StringFieldUpdateOperationsInput | string
     skills?: MasterProfileUpdateskillsInput | string[]
+    plan?: StringFieldUpdateOperationsInput | string
     pitches?: SavedPitchUncheckedUpdateManyWithoutProfileNestedInput
   }
 
@@ -5468,6 +5500,7 @@ export namespace Prisma {
     jobTitle: string
     bio: string
     skills?: MasterProfileCreateskillsInput | string[]
+    plan?: string
     projects?: ProjectCreateNestedManyWithoutProfileInput
   }
 
@@ -5480,6 +5513,7 @@ export namespace Prisma {
     jobTitle: string
     bio: string
     skills?: MasterProfileCreateskillsInput | string[]
+    plan?: string
     projects?: ProjectUncheckedCreateNestedManyWithoutProfileInput
   }
 
@@ -5508,6 +5542,7 @@ export namespace Prisma {
     jobTitle?: StringFieldUpdateOperationsInput | string
     bio?: StringFieldUpdateOperationsInput | string
     skills?: MasterProfileUpdateskillsInput | string[]
+    plan?: StringFieldUpdateOperationsInput | string
     projects?: ProjectUpdateManyWithoutProfileNestedInput
   }
 
@@ -5520,6 +5555,7 @@ export namespace Prisma {
     jobTitle?: StringFieldUpdateOperationsInput | string
     bio?: StringFieldUpdateOperationsInput | string
     skills?: MasterProfileUpdateskillsInput | string[]
+    plan?: StringFieldUpdateOperationsInput | string
     projects?: ProjectUncheckedUpdateManyWithoutProfileNestedInput
   }
 

@@ -34,6 +34,7 @@ export interface MasterProfile {
   email?: string;
   websiteUrl?: string;
   avatarUrl?: string;
+  plan?: "free" | "pro";
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

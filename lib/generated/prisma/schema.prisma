@@ -26,6 +26,7 @@ model MasterProfile {
   skills      String[] // Supported natively by PostgreSQL
   projects    Project[]
   pitches     SavedPitch[]
+  plan        String       @default("free")
 }
 
 model Project {

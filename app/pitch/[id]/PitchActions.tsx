@@ -132,41 +132,52 @@ html,body{
 }
 
 /* ─── TOP HEADER ─── */
-.top-rule{
+.top-rule {
   border-bottom: 2px solid #111;
-  padding-bottom: 18px;
-  margin-bottom: 32px;
+  padding-bottom: 12px;
+  margin-bottom: 24px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  gap: 24px;
+  align-items: center;
 }
-.brand{
-  flex-shrink: 0;
-}
-.brand-name{
+.brand-name {
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: #111;
-  display: block;
 }
-.brand-sub{
-  font-size: 10px;
-  color: #666;
-  display: block;
-  margin-top: 3px;
-}
-.meta{
-  text-align: right;
+.meta-date {
   font-size: 11px;
-  color: #444;
-  line-height: 1.6;
-  flex-shrink: 0;
-  max-width: 380px;
+  color: #666;
+  font-weight: 600;
 }
-.meta strong{color: #111; font-weight: 600}
+
+/* ─── CONTEXT BLOCK (GOAL & CLIENT) ─── */
+.context-block {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 28px;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e5e5;
+  page-break-inside: avoid;
+}
+.context-col {
+  display: flex;
+  flex-direction: column;
+}
+.context-col.left-border {
+  border-left: 1px solid #e5e5e5;
+  padding-left: 24px;
+}
+.context-val {
+  font-size: 12.5px;
+  color: #2b2b2b;
+  line-height: 1.65;
+  font-weight: 500;
+  text-align: left;
+}
 
 /* ─── DIVIDER ─── */
 .rule{border: none; border-top: 1px solid #e5e5e5; margin: 28px 0}
@@ -397,14 +408,19 @@ html,body{
 
   <!-- Header -->
   <div class="top-rule">
-    <div class="brand">
-      <span class="brand-name">Synthesis AI</span>
-      <span class="brand-sub">Tailored Pitch Proposal</span>
+    <div class="brand-name">Synthesis AI</div>
+    <div class="meta-date">Date: ${dateStr}</div>
+  </div>
+
+  <!-- Document Title & Context Block -->
+  <div class="context-block">
+    <div class="context-col">
+      <span class="label">Proposal Goal</span>
+      <div class="context-val" style="font-weight: 700;">${sanitize(ctx.pitchGoal)}</div>
     </div>
-    <div class="meta">
-      <div>Prepared for: <strong>${sanitize(ctx.targetAudience)}</strong></div>
-      <div>Goal: <strong>${sanitize(ctx.pitchGoal)}</strong></div>
-      <div>Date: <strong>${dateStr}</strong></div>
+    <div class="context-col left-border">
+      <span class="label">Prepared For</span>
+      <div class="context-val">${sanitize(ctx.targetAudience)}</div>
     </div>
   </div>
 

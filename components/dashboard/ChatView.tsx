@@ -195,7 +195,7 @@ export function ChatView({ profile, lang }: ChatViewProps) {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-7rem)] max-h-[800px] bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden animate-fade-in">
+    <div className="flex flex-col h-full bg-surface-container-lowest overflow-hidden animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-outline-variant bg-surface shrink-0">
         <div className="flex items-center gap-3">

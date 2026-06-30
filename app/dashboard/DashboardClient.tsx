@@ -1465,8 +1465,11 @@ export function DashboardClient({
           )}
         </AnimatePresence>
 
-        {/* Main Scrollable Content */}
-        <main className="flex-1 overflow-y-auto overscroll-y-contain p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full">
+        {/* Main Content — no outer scroll on chat tab */}
+        <main className={activeTab === "chat"
+          ? "flex-1 overflow-hidden flex flex-col"
+          : "flex-1 overflow-y-auto overscroll-y-contain p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full"
+        }>
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -1474,7 +1477,7 @@ export function DashboardClient({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.25 }}
-              className="pb-8"
+              className={activeTab === "chat" ? "flex flex-col flex-1 h-full overflow-hidden" : "pb-8"}
             >
               {activeTab === "dashboard" && (
                 <DashboardView

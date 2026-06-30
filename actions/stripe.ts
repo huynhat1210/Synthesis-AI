@@ -27,9 +27,7 @@ export async function createCheckoutSessionAction(): Promise<ApiResponse<string>
     };
   }
 
-  const stripe = new Stripe(secretKey, {
-    apiVersion: "2024-11-20.accredited" as any, // compatible versioning
-  });
+  const stripe = new Stripe(secretKey);
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
@@ -86,9 +84,7 @@ export async function verifyCheckoutSessionAction(
     return { data: null, error: "Stripe is not configured." };
   }
 
-  const stripe = new Stripe(secretKey, {
-    apiVersion: "2024-11-20.accredited" as any,
-  });
+  const stripe = new Stripe(secretKey);
 
   try {
     // Retrieve checkout session details directly from Stripe

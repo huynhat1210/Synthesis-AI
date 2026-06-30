@@ -50,6 +50,8 @@ export interface ClientContext {
   rawContext?: string;
   /** Optional subset of profile skills selected for generation */
   selectedSkills?: string[];
+  /** Slider value from 0 to 100 where 0 is Formal, 100 is Casual */
+  toneValue?: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

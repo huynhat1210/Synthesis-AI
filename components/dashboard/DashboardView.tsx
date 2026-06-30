@@ -23,7 +23,7 @@ interface DashboardViewProps {
   copiedScenario: string | null;
   copyToClipboard: (text: string, id: string) => void;
   setActiveTab: (tab: any) => void;
-  showNotification: (msg: string, type?: "success" | "info") => void;
+  showNotification: (msg: string, type?: "success" | "info" | "error") => void;
   syncProfileToServer: (p: MasterProfile) => void;
   handleSaveCurrentPitch: () => void;
   renderIcon: (name: string) => React.ReactNode;
@@ -390,6 +390,36 @@ ${currentResult.scenarioB.content}
                   </div>
                 </div>
               )}
+
+              <div>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="block text-xs font-semibold text-primary uppercase tracking-wider">
+                    Tone of Voice (Slider)
+                  </label>
+                  <span className="text-[10px] font-bold text-secondary uppercase bg-secondary/10 px-2 py-0.5 rounded">
+                    {inputs.toneValue !== undefined
+                      ? inputs.toneValue < 35
+                        ? `Formal (${inputs.toneValue}/100)`
+                        : inputs.toneValue > 70
+                        ? `Casual (${inputs.toneValue}/100)`
+                        : `Balanced (${inputs.toneValue}/100)`
+                      : "Balanced (50/100)"}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={inputs.toneValue !== undefined ? inputs.toneValue : 50}
+                  onChange={(e) => setInputs({ ...inputs, toneValue: parseInt(e.target.value) })}
+                  className="w-full h-1.5 bg-outline-variant rounded-lg appearance-none cursor-pointer accent-secondary"
+                />
+                <div className="flex justify-between text-[10px] text-on-surface-variant font-medium mt-1">
+                  <span>Corporate (0)</span>
+                  <span>Balanced (50)</span>
+                  <span>Startup (100)</span>
+                </div>
+              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>

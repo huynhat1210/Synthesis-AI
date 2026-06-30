@@ -27,6 +27,8 @@ import {
   Award,
   Heart,
   Target,
+  AlertCircle,
+  Info,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { UserButton } from "@clerk/nextjs";
@@ -73,6 +75,7 @@ const INITIAL_INPUTS: ClientContext = {
   pitchGoal: "Freelance Project Proposal",
   style: "Persuasive",
   length: "Medium",
+  toneValue: 50,
 };
 
 const INITIAL_RESULT: GeneratedPitch = {
@@ -183,7 +186,7 @@ export function DashboardClient({
   const [loadingStep, setLoadingStep] = useState(0);
   const [notification, setNotification] = useState<{
     message: string;
-    type: "success" | "info";
+    type: "success" | "info" | "error";
   } | null>(null);
   const [copiedScenario, setCopiedScenario] = useState<string | null>(null);
 
@@ -290,7 +293,10 @@ export function DashboardClient({
     }
   }, [loading]);
 
-  const showNotification = (message: string, type: "success" | "info" = "success") => {
+  const showNotification = (
+    message: string,
+    type: "success" | "info" | "error" = "success"
+  ) => {
     setNotification({ message, type });
   };
 
@@ -514,22 +520,39 @@ export function DashboardClient({
       <AnimatePresence>
         {notification && (
           <motion.div
-            initial={{ opacity: 0, y: -50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 16, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            initial={{ opacity: 0, y: -40, x: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 16, x: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, x: 10, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className={cn(
-              "fixed top-4 right-4 z-50 px-5 py-3 rounded-lg shadow-lg flex items-center gap-3 border",
+              "fixed top-4 right-4 z-50 px-5 py-3.5 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] backdrop-blur-md flex items-center gap-3.5 border text-sm font-semibold overflow-hidden max-w-sm md:max-w-md transition-all",
               notification.type === "success"
-                ? "bg-secondary text-on-secondary border-secondary/20"
-                : "bg-primary-container text-on-primary border-primary-container/20"
+                ? "bg-emerald-50/95 text-emerald-800 border-emerald-200/80 shadow-[0_8px_25px_rgba(16,185,129,0.08)]"
+                : notification.type === "error"
+                ? "bg-rose-50/95 text-rose-800 border-rose-200/80 shadow-[0_8px_25px_rgba(244,63,94,0.08)]"
+                : "bg-slate-50/95 text-slate-800 border-slate-200/80 shadow-[0_8px_25px_rgba(71,85,105,0.06)]"
             )}
           >
-            {notification.type === "success" ? (
-              <CheckCircle className="w-5 h-5" />
-            ) : (
-              <HelpCircle className="w-5 h-5" />
+            {notification.type === "success" && (
+              <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
             )}
-            <span className="text-sm font-medium">{notification.message}</span>
+            {notification.type === "error" && (
+              <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 animate-bounce" />
+            )}
+            {notification.type === "info" && (
+              <Info className="w-5 h-5 text-slate-600 shrink-0" />
+            )}
+            <span className="leading-snug pr-2">{notification.message}</span>
+            
+            {/* Visual Progress Bar indicator */}
+            <div className="absolute bottom-0 left-0 h-0.5 w-full bg-current opacity-20">
+              <motion.div
+                initial={{ width: "100%" }}
+                animate={{ width: "0%" }}
+                transition={{ duration: 4, ease: "linear" }}
+                className="h-full bg-current"
+              />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -717,10 +740,17 @@ export function DashboardClient({
             </h1>
 
             {/* Quick indicators */}
-            <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-container-low text-primary-container border border-outline-variant">
-              <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
-              {hasApiKey ? "AI Engine Connected" : "Local Playground Mode"}
-            </span>
+            {hasApiKey ? (
+              <span className="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.05)] transition-all">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]"></span>
+                Gemini AI Connected (Online)
+              </span>
+            ) : (
+              <span className="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20 shadow-[0_0_12px_rgba(245,158,11,0.05)] transition-all">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shadow-[0_0_8px_#f59e0b]"></span>
+                Local Simulation Mode (Offline Sandbox)
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-2">

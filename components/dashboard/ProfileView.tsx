@@ -16,7 +16,7 @@ interface ProfileViewProps {
   handleAddSkill: (e: React.FormEvent) => void;
   handleRemoveSkill: (skill: string) => void;
   setActiveTab: (tab: any) => void;
-  showNotification: (msg: string, type?: "success" | "info") => void;
+  showNotification: (msg: string, type?: "success" | "info" | "error") => void;
   syncProfileToServer: (p: MasterProfile) => void;
 }
 

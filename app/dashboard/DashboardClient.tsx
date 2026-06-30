@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { UserButton } from "@clerk/nextjs";
+import Link from "next/link";
 
 import { generatePitchAction } from "@/actions/generatePitch";
 import { saveProfileAction } from "@/actions/saveProfile";
@@ -560,9 +561,11 @@ export function DashboardClient({
       {/* SideNavBar */}
       <nav className="hidden md:flex w-[280px] h-screen flex-col border-r border-outline-variant bg-surface shrink-0 py-6">
         <div className="px-6 mb-8">
-          <h2 className="text-xl font-bold font-geist text-primary tracking-tight">
-            Synthesis AI
-          </h2>
+          <Link href="/" className="hover:opacity-85 transition-opacity cursor-pointer block">
+            <h2 className="text-xl font-bold font-geist text-primary tracking-tight">
+              Synthesis AI
+            </h2>
+          </Link>
           <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant/80">
             Context-Aware Generator
           </p>
@@ -734,10 +737,12 @@ export function DashboardClient({
         {/* TopNavBar */}
         <header className="h-16 w-full flex justify-between items-center px-6 border-b border-outline-variant bg-surface-container-lowest sticky top-0 z-10 shrink-0">
           <div className="flex items-center gap-3 w-1/2">
-            <Sparkles className="w-6 h-6 text-secondary" />
-            <h1 className="text-lg font-bold font-geist text-primary tracking-tight">
-              PitchPerfect
-            </h1>
+            <Link href="/" className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer">
+              <Sparkles className="w-6 h-6 text-secondary" />
+              <h1 className="text-lg font-bold font-geist text-primary tracking-tight">
+                PitchPerfect
+              </h1>
+            </Link>
 
             {/* Quick indicators */}
             {hasApiKey ? (

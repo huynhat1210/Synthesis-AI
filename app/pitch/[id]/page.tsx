@@ -5,6 +5,7 @@
  *              Securely fetches from database via readPitchPublic (does not require Clerk auth).
  */
 import React from "react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Sparkles, Mail, Globe, Briefcase, Award, CheckCircle, ArrowRight } from "lucide-react";
 import { readPitchPublic } from "@/lib/storage";
@@ -39,12 +40,12 @@ export default async function PublicPitchPage({ params }: PitchPageProps) {
       <div className="max-w-6xl mx-auto px-6 py-12 lg:py-20 relative z-10">
         {/* Top Header */}
         <header className="flex justify-between items-center mb-16 border-b border-white/10 pb-6">
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-85 transition-opacity cursor-pointer">
             <Sparkles className="w-6 h-6 text-secondary-container" />
             <span className="text-sm font-bold font-geist tracking-wider uppercase text-gray-300">
               Synthesis Portal
             </span>
-          </div>
+          </Link>
           <span className="bg-white/5 text-gray-400 px-3 py-1 rounded-full text-xs font-semibold border border-white/10">
             Tailored Proposal Pitch
           </span>

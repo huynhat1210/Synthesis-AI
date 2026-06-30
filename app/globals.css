@@ -4,6 +4,7 @@
  * Mirrors the existing Vite prototype's colour palette exactly.
  */
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
   /* ── Fonts ──────────────────────────────────────────────────────────── */

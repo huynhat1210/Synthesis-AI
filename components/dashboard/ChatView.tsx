@@ -8,6 +8,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Sparkles, Send, RefreshCw, User, Bot, Lightbulb, ChevronDown } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   sendChatMessageAction,
   loadChatHistoryAction,
@@ -77,13 +79,17 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
 
       {/* Bubble */}
       <div
-        className={`max-w-[78%] px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap rounded-2xl ${
+        className={`max-w-[78%] px-4 py-3 text-sm leading-relaxed rounded-2xl ${
           isUser
             ? "bg-secondary/15 text-primary border border-secondary/20 rounded-br-sm"
             : "bg-surface-container border border-outline-variant text-on-surface rounded-bl-sm"
         }`}
       >
-        {msg.content}
+        <div className="prose prose-sm max-w-none prose-p:my-1 prose-p:leading-relaxed prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:mt-2 prose-headings:mb-1 prose-pre:bg-surface-container-high prose-pre:text-xs prose-code:text-xs prose-code:bg-surface-container-high prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-strong:text-primary prose-a:text-secondary">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {msg.content}
+          </ReactMarkdown>
+        </div>
       </div>
     </motion.div>
   );

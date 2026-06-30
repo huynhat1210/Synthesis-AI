@@ -30,6 +30,7 @@ import {
   AlertCircle,
   Info,
   Check,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { UserButton } from "@clerk/nextjs";
@@ -161,6 +162,7 @@ export function DashboardClient({
   // ── Reset Confirmation Modal state ───────────────────────────────────
   const [showResetModal, setShowResetModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   const handleConfirmReset = async () => {
     const defaults: MasterProfile = {
@@ -937,6 +939,98 @@ export function DashboardClient({
         )}
       </AnimatePresence>
 
+      {/* ── Share Pitch Proposal Modal ── */}
+      <AnimatePresence>
+        {shareUrl && (
+          <motion.div
+            key="share-modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+            onClick={(e) => { if (e.target === e.currentTarget) setShareUrl(null); }}
+          >
+            <motion.div
+              key="share-modal"
+              initial={{ opacity: 0, scale: 0.92, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 16 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-surface-container-lowest border border-outline-variant rounded-2xl shadow-2xl w-full max-w-md p-6 text-center"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-outline-variant pb-3 mb-4">
+                <span className="text-xs font-black text-primary uppercase tracking-wider">
+                  {lang === "vi" ? "Chia sẻ kịch bản Pitch" : "Share Proposal Pitch"}
+                </span>
+                <button
+                  onClick={() => setShareUrl(null)}
+                  className="text-on-surface-variant hover:text-error cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* QR Code Container */}
+              <div className="py-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}&color=006b5f`}
+                  alt="Pitch QR Code"
+                  className="w-44 h-44 mx-auto rounded-xl border border-outline-variant p-2 bg-white shadow-md"
+                />
+                <p className="text-[10px] text-on-surface-variant mt-3 font-semibold">
+                  {lang === "vi" ? "Quét mã QR để xem bài Pitch trên điện thoại di động" : "Scan QR code to view the Pitch on mobile devices"}
+                </p>
+              </div>
+
+              {/* URL Input Box */}
+              <div className="space-y-1.5 text-left mb-5">
+                <label className="text-[10px] font-bold text-primary uppercase tracking-wider">
+                  {lang === "vi" ? "Đường dẫn bài viết:" : "Public Link URL:"}
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={shareUrl}
+                    className="flex-1 bg-surface border border-outline-variant rounded-lg px-3 py-2 text-xs text-primary outline-none focus:border-secondary font-mono"
+                  />
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(shareUrl);
+                      showNotification(lang === "vi" ? "Đã sao chép liên kết!" : "Link copied to clipboard!", "success");
+                    }}
+                    className="bg-secondary text-on-secondary px-3.5 py-2 rounded-lg text-xs font-bold uppercase hover:bg-secondary/95 active:scale-95 transition-all cursor-pointer"
+                  >
+                    {lang === "vi" ? "Copy" : "Copy"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Social Channels */}
+              <div className="grid grid-cols-2 gap-3 mb-2">
+                <a
+                  href={`mailto:?subject=Personalized Proposal Pitch&body=${encodeURIComponent("Hi! I have generated a custom proposal matching your requirements: " + shareUrl)}`}
+                  className="px-4 py-2 border border-outline-variant hover:bg-surface-container-low rounded-xl text-xs font-bold text-primary flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  ✉️ Email
+                </a>
+                <a
+                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 border border-outline-variant hover:bg-surface-container-low rounded-xl text-xs font-bold text-primary flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  🌐 LinkedIn
+                </a>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* SideNavBar */}
       <nav className="hidden md:flex w-[280px] h-screen flex-col border-r border-outline-variant bg-surface shrink-0 py-6">
         <div className="px-6 mb-8">
@@ -1389,6 +1483,7 @@ export function DashboardClient({
                   copyToClipboard={copyToClipboard}
                   handleDeleteSavedPitch={handleDeleteSavedPitch}
                   lang={lang}
+                  onSharePitch={(url) => setShareUrl(url)}
                 />
               )}
 

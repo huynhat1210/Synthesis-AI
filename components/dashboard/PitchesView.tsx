@@ -17,6 +17,7 @@ interface PitchesViewProps {
   copyToClipboard: (text: string, id: string) => void;
   handleDeleteSavedPitch: (id: string) => void;
   lang: Language;
+  onSharePitch: (shareUrl: string) => void;
 }
 
 export function PitchesView({
@@ -26,6 +27,7 @@ export function PitchesView({
   copyToClipboard,
   handleDeleteSavedPitch,
   lang,
+  onSharePitch,
 }: PitchesViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const t = translations[lang];
@@ -138,7 +140,7 @@ export function PitchesView({
                 onClick={() => {
                   if (typeof window !== "undefined") {
                     const shareUrl = `${window.location.origin}/pitch/${saved.id}`;
-                    copyToClipboard(shareUrl, `share-${saved.id}`);
+                    onSharePitch(shareUrl);
                   }
                 }}
                 className="p-2 border border-outline hover:bg-surface-container-high rounded-lg text-primary transition-colors flex items-center gap-1 hover:text-secondary cursor-pointer"

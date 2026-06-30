@@ -9,6 +9,7 @@ import { Sparkles, Zap, ChevronRight, CheckCircle, Check, Copy, Share2, Trending
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import type { MasterProfile, ClientContext, GeneratedPitch } from "@/types";
+import { translations, type Language } from "@/lib/translations";
 
 interface DashboardViewProps {
   profile: MasterProfile;
@@ -30,6 +31,7 @@ interface DashboardViewProps {
   renderIcon: (name: string) => React.ReactNode;
   handlePdfUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   parsingPdf: boolean;
+  lang: Language;
 }
 
 export function DashboardView({
@@ -52,6 +54,7 @@ export function DashboardView({
   renderIcon,
   handlePdfUpload,
   parsingPdf,
+  lang,
 }: DashboardViewProps) {
   const handleExportPdf = () => {
     if (!currentResult) return;
@@ -157,6 +160,8 @@ ${currentResult.scenarioB.content}
     showNotification("Formatted Markdown proposal copied to clipboard!", "success");
   };
 
+  const t = translations[lang];
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -165,14 +170,16 @@ ${currentResult.scenarioB.content}
           initial={{ opacity: 0, x: -25 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ type: "spring", stiffness: 100, damping: 15 }}
-          className="lg:col-span-7 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm relative"
+          className="lg:col-span-7 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm relative text-left"
         >
           <div className="border-b border-outline-variant pb-4 mb-6">
             <h3 className="text-lg font-bold font-geist text-primary uppercase">
-              BUILD YOUR MASTER PROFILE
+              {t.buildProfile}
             </h3>
             <p className="text-xs text-on-surface-variant mt-1">
-              Foundational professional context used to power your generated pitches.
+              {lang === "vi"
+                ? "Thông tin nền tảng chuyên môn dùng để làm căn cứ tự động viết các bài pitch cá nhân hóa."
+                : "Foundational professional context used to power your generated pitches."}
             </p>
           </div>
 
@@ -180,7 +187,7 @@ ${currentResult.scenarioB.content}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">
-                  Full Name
+                  {t.fullName}
                 </label>
                 <input
                   type="text"
@@ -192,7 +199,7 @@ ${currentResult.scenarioB.content}
               </div>
               <div>
                 <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">
-                  Job Title
+                  {t.jobTitle}
                 </label>
                 <input
                   type="text"
@@ -206,19 +213,19 @@ ${currentResult.scenarioB.content}
 
             <div>
               <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">
-                Professional Bio
+                {t.bio}
               </label>
               <textarea
                 value={profile.bio}
                 onChange={(e) => setProfileState({ ...profile, bio: e.target.value })}
                 className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 text-sm focus:border-secondary focus:ring-2 focus:ring-secondary/10 outline-none transition-all h-24 resize-none leading-relaxed"
-                placeholder="Brief summary of your professional journey..."
+                placeholder={lang === "vi" ? "Tóm tắt ngắn gọn chặng đường sự nghiệp của bạn..." : "Brief summary of your professional journey..."}
               />
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">
-                Key Skills
+                {t.skills}
               </label>
               <div className="flex flex-wrap gap-2 mb-2 p-2 border border-outline-variant rounded-lg min-h-12 bg-surface">
                 {profile.skills.map((skill, index) => (
@@ -230,7 +237,7 @@ ${currentResult.scenarioB.content}
                     <button
                       type="button"
                       onClick={() => handleRemoveSkill(skill)}
-                      className="hover:text-error text-on-surface-variant transition-colors"
+                      className="hover:text-error text-on-surface-variant transition-colors cursor-pointer"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -242,7 +249,7 @@ ${currentResult.scenarioB.content}
                     value={newSkill}
                     onChange={(e) => setNewSkill(e.target.value)}
                     className="bg-transparent border-none text-xs p-1 outline-none w-full"
-                    placeholder="Add skill..."
+                    placeholder={t.addSkillPlaceholder}
                   />
                 </form>
               </div>
@@ -251,13 +258,13 @@ ${currentResult.scenarioB.content}
             <div>
               <div className="flex justify-between items-center mb-3">
                 <label className="text-xs font-semibold text-primary uppercase tracking-wider">
-                  Featured Projects
+                  {t.featuredProjects}
                 </label>
                 <button
                   onClick={() => setActiveTab("projects")}
-                  className="text-xs text-secondary hover:underline flex items-center gap-1 font-semibold"
+                  className="text-xs text-secondary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
                 >
-                  Manage Projects <ChevronRight className="w-3 h-3" />
+                  {lang === "vi" ? "Quản lý dự án" : "Manage Projects"} <ChevronRight className="w-3 h-3" />
                 </button>
               </div>
 
@@ -285,7 +292,7 @@ ${currentResult.scenarioB.content}
                 ))}
                 {profile.projects.length === 0 && (
                   <div className="col-span-2 text-center py-4 border border-dashed border-outline-variant rounded-lg text-xs text-on-surface-variant">
-                    No projects added yet. Click Manage Projects to add one.
+                    {lang === "vi" ? "Chưa có dự án nào. Bấm Quản lý dự án để thêm mới." : "No projects added yet. Click Manage Projects to add one."}
                   </div>
                 )}
               </div>
@@ -294,12 +301,12 @@ ${currentResult.scenarioB.content}
             <div className="pt-2">
               <button
                 onClick={() => {
-                  showNotification("Master Profile configuration saved on server!");
+                  showNotification(t.profileSaved);
                   syncProfileToServer(profile);
                 }}
-                className="bg-primary-container text-on-primary hover:bg-primary-container/95 px-5 py-2.5 rounded-lg text-xs font-semibold hover:shadow-sm transition-all"
+                className="bg-primary-container text-on-primary hover:bg-primary-container/95 px-5 py-2.5 rounded-lg text-xs font-semibold hover:shadow-sm transition-all cursor-pointer"
               >
-                Save Master Profile
+                {t.saveProfileBtn}
               </button>
             </div>
           </div>
@@ -318,7 +325,7 @@ ${currentResult.scenarioB.content}
             <div className="border-b border-outline-variant pb-4 mb-6">
               <h3 className="text-lg font-bold font-geist text-primary flex items-center gap-2 uppercase">
                 <Sparkles className="w-5 h-5 text-secondary" />
-                GENERATE PITCH
+                {t.generatePitchHeader}
               </h3>
             </div>
 
@@ -326,11 +333,11 @@ ${currentResult.scenarioB.content}
               <div>
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="block text-xs font-semibold text-primary uppercase tracking-wider">
-                    Target Audience Description
+                    {t.targetAudienceLabel}
                   </label>
                   <label className="text-[10px] text-secondary hover:text-secondary/80 cursor-pointer font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors">
                     <FileUp className="w-3.5 h-3.5" />
-                    <span>{parsingPdf ? "Scanning..." : "Upload JD PDF"}</span>
+                    <span>{parsingPdf ? (lang === "vi" ? "Đang quét..." : "Scanning...") : t.uploadJdBtn}</span>
                     <input
                       type="file"
                       accept=".pdf"
@@ -345,14 +352,14 @@ ${currentResult.scenarioB.content}
                     value={inputs.targetAudience}
                     onChange={(e) => setInputs({ ...inputs, targetAudience: e.target.value })}
                     className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 text-sm focus:border-secondary focus:ring-2 focus:ring-secondary/10 outline-none transition-all h-32 resize-none leading-relaxed"
-                    placeholder="Describe who you are pitching to or upload a Job Description PDF above..."
+                    placeholder={t.targetAudiencePlaceholder}
                   />
                   {parsingPdf && (
                     <div className="absolute inset-0 bg-surface/85 backdrop-blur-[1px] flex flex-col justify-center items-center rounded-lg z-10 overflow-hidden border border-secondary/20">
                       <div className="absolute top-0 left-0 w-full h-[2px] bg-secondary shadow-[0_0_10px_#006b5f] animate-scan"></div>
                       <div className="flex items-center gap-2.5 text-secondary font-bold text-xs tracking-wider uppercase animate-pulse">
                         <div className="w-3.5 h-3.5 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div>
-                        <span>AI is Scanning PDF...</span>
+                        <span>{t.scanLaserTooltip}</span>
                       </div>
                     </div>
                   )}
@@ -361,28 +368,30 @@ ${currentResult.scenarioB.content}
 
               <div>
                 <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">
-                  Pitch Goal / Context Type
+                  {lang === "vi" ? "Mục tiêu / Loại bài Pitch" : "Pitch Goal / Context Type"}
                 </label>
                 <select
                   value={inputs.pitchGoal}
                   onChange={(e) => setInputs({ ...inputs, pitchGoal: e.target.value })}
                   className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 text-sm focus:border-secondary focus:ring-2 focus:ring-secondary/10 outline-none transition-all cursor-pointer"
                 >
-                  <option value="Freelance Project Proposal">Freelance Project Proposal</option>
-                  <option value="Job Interview Presentation">Job Interview Presentation</option>
-                  <option value="Sales Pitch & Demo">Sales Pitch & Demo</option>
-                  <option value="Internal Stakeholder Alignment">Internal Stakeholder Alignment</option>
-                  <option value="Executive Briefing & Summary">Executive Briefing & Summary</option>
+                  <option value="Freelance Project Proposal">{lang === "vi" ? "Đề xuất dự án Freelance" : "Freelance Project Proposal"}</option>
+                  <option value="Job Interview Presentation">{lang === "vi" ? "Thuyết trình phỏng vấn" : "Job Interview Presentation"}</option>
+                  <option value="Sales Pitch & Demo">{lang === "vi" ? "Sales Pitch & Demo" : "Sales Pitch & Demo"}</option>
+                  <option value="Internal Stakeholder Alignment">{lang === "vi" ? "Trình bày nội bộ" : "Internal Stakeholder Alignment"}</option>
+                  <option value="Executive Briefing & Summary">{lang === "vi" ? "Báo cáo Ban Lãnh đạo" : "Executive Briefing & Summary"}</option>
                 </select>
               </div>
 
               {profile.skills.length > 0 && (
                 <div>
                   <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">
-                    Customize Included Skills (Smart Selector)
+                    {t.smartSelectorLabel}
                   </label>
                   <p className="text-[10px] text-on-surface-variant mb-2">
-                    Toggle which Master Profile skills to focus the AI pitch generation on.
+                    {lang === "vi"
+                      ? "Chọn kỹ năng nào trong hồ sơ sẽ được AI ưu tiên nhấn mạnh."
+                      : "Toggle which Master Profile skills to focus the AI pitch generation on."}
                   </p>
                   <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1.5 border border-outline-variant rounded-lg bg-surface-container-lowest">
                     {profile.skills.map((skill) => {
@@ -416,16 +425,16 @@ ${currentResult.scenarioB.content}
               <div>
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="block text-xs font-semibold text-primary uppercase tracking-wider">
-                    Tone of Voice (Slider)
+                    {t.toneSliderLabel}
                   </label>
                   <span className="text-[10px] font-bold text-secondary uppercase bg-secondary/10 px-2 py-0.5 rounded">
                     {inputs.toneValue !== undefined
                       ? inputs.toneValue < 35
-                        ? `Formal (${inputs.toneValue}/100)`
+                        ? `${t.toneFormal} (${inputs.toneValue}/100)`
                         : inputs.toneValue > 70
-                        ? `Casual (${inputs.toneValue}/100)`
-                        : `Balanced (${inputs.toneValue}/100)`
-                      : "Balanced (50/100)"}
+                        ? `${t.toneCasual} (${inputs.toneValue}/100)`
+                        : `${t.toneBalanced} (${inputs.toneValue}/100)`
+                      : `${t.toneBalanced} (50/100)`}
                   </span>
                 </div>
                 <input
@@ -437,40 +446,40 @@ ${currentResult.scenarioB.content}
                   className="w-full h-1.5 bg-outline-variant rounded-lg appearance-none cursor-pointer accent-secondary"
                 />
                 <div className="flex justify-between text-[10px] text-on-surface-variant font-medium mt-1">
-                  <span>Corporate (0)</span>
-                  <span>Balanced (50)</span>
-                  <span>Startup (100)</span>
+                  <span>{lang === "vi" ? "Trang trọng (0)" : "Corporate (0)"}</span>
+                  <span>{lang === "vi" ? "Trung lập (50)" : "Balanced (50)"}</span>
+                  <span>{lang === "vi" ? "Năng động (100)" : "Startup (100)"}</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">
-                    AI Writing Style
+                    {lang === "vi" ? "Phong cách viết AI" : "AI Writing Style"}
                   </label>
                   <select
                     value={inputs.style}
                     onChange={(e) => setInputs({ ...inputs, style: e.target.value as any })}
                     className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-2.5 text-xs focus:border-secondary focus:ring-2 focus:ring-secondary/10 outline-none transition-all"
                   >
-                    <option value="Persuasive">Persuasive</option>
-                    <option value="Creative">Creative</option>
-                    <option value="Analytical">Analytical</option>
-                    <option value="Bold">Bold</option>
+                    <option value="Persuasive">{lang === "vi" ? "Thuyết phục" : "Persuasive"}</option>
+                    <option value="Creative">{lang === "vi" ? "Sáng tạo" : "Creative"}</option>
+                    <option value="Analytical">{lang === "vi" ? "Phân tích" : "Analytical"}</option>
+                    <option value="Bold">{lang === "vi" ? "Mạnh mẽ" : "Bold"}</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">
-                    Pitch Length
+                    {lang === "vi" ? "Độ dài bài Pitch" : "Pitch Length"}
                   </label>
                   <select
                     value={inputs.length}
                     onChange={(e) => setInputs({ ...inputs, length: e.target.value as any })}
                     className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-2.5 text-xs focus:border-secondary focus:ring-2 focus:ring-secondary/10 outline-none transition-all"
                   >
-                    <option value="Short">Short (~100 words)</option>
-                    <option value="Medium">Medium (~200 words)</option>
-                    <option value="Long">Long (~350 words)</option>
+                    <option value="Short">{lang === "vi" ? "Ngắn (~100 từ)" : "Short (~100 words)"}</option>
+                    <option value="Medium">{lang === "vi" ? "Vừa (~200 từ)" : "Medium (~200 words)"}</option>
+                    <option value="Long">{lang === "vi" ? "Dài (~350 từ)" : "Long (~350 words)"}</option>
                   </select>
                 </div>
               </div>
@@ -483,7 +492,7 @@ ${currentResult.scenarioB.content}
               className="w-full bg-secondary hover:bg-secondary/95 text-on-secondary px-6 py-3.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:shadow-md transition-all active:scale-98 flex justify-center items-center gap-2 cursor-pointer"
             >
               <Zap className="w-4 h-4 text-on-secondary" />
-              GENERATE DYNAMIC PITCH
+              {t.generatePitchBtn}
             </button>
           </div>
         </motion.div>
@@ -499,33 +508,35 @@ ${currentResult.scenarioB.content}
         <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-outline-variant pb-4 mb-6 gap-3">
           <div>
             <h3 className="text-lg font-bold font-geist text-primary uppercase">
-              LIVE PITCH PREVIEW
+              {t.livePreviewHeader}
             </h3>
             <p className="text-xs text-on-surface-variant">
-              Review the generated target scenarios dynamically optimized for your objectives.
+              {lang === "vi"
+                ? "Xem lại các kịch bản pitch đã được AI tối ưu hóa theo mục tiêu của bạn."
+                : "Review the generated target scenarios dynamically optimized for your objectives."}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => {
                 setActiveTab("profile");
-                showNotification("Opening Master Profile edit space.");
+                showNotification(lang === "vi" ? "Mở không gian chỉnh sửa hồ sơ Master Profile." : "Opening Master Profile edit space.");
               }}
-              className="px-3.5 py-2 border border-outline text-primary hover:bg-surface-container-low rounded-lg text-xs font-semibold transition-colors"
+              className="px-3.5 py-2 border border-outline text-primary hover:bg-surface-container-low rounded-lg text-xs font-semibold transition-colors cursor-pointer"
             >
-              Edit Profile Context
+              {lang === "vi" ? "Chỉnh sửa hồ sơ" : "Edit Profile Context"}
             </button>
             <button
               onClick={handleGeneratePitch}
-              className="px-3.5 py-2 border border-outline text-primary hover:bg-surface-container-low rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5"
+              className="px-3.5 py-2 border border-outline text-primary hover:bg-surface-container-low rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Re-Generate
+              <RefreshCw className="w-3.5 h-3.5" /> {lang === "vi" ? "Tạo lại" : "Re-Generate"}
             </button>
             <button
               onClick={handleSaveCurrentPitch}
-              className="px-3.5 py-2 bg-primary-container hover:bg-primary-container/95 text-on-primary rounded-lg text-xs font-semibold transition-all"
+              className="px-3.5 py-2 bg-primary-container hover:bg-primary-container/95 text-on-primary rounded-lg text-xs font-semibold transition-all cursor-pointer"
             >
-              Save to Archive
+              {lang === "vi" ? "Lưu vào kho" : "Save to Archive"}
             </button>
           </div>
         </div>
@@ -536,9 +547,9 @@ ${currentResult.scenarioB.content}
               <Sparkles className="w-6 h-6 text-secondary animate-pulse" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-primary font-geist">No Live Pitch Preview Loaded</h4>
+              <h4 className="text-sm font-bold text-primary font-geist">{t.noPreviewLoaded}</h4>
               <p className="text-xs text-on-surface-variant max-w-sm mx-auto mt-1 leading-relaxed">
-                Describe your target audience in the input fields and click <strong>GENERATE DYNAMIC PITCH</strong> above to view your personalized scenarios!
+                {t.noPreviewDesc}
               </p>
             </div>
           </div>
@@ -559,8 +570,8 @@ ${currentResult.scenarioB.content}
                           "scenA"
                         )
                       }
-                      className="p-1.5 hover:bg-surface-container-high rounded text-on-surface-variant transition-colors relative"
-                      title="Copy Scenario A"
+                      className="p-1.5 hover:bg-surface-container-high rounded text-on-surface-variant transition-colors relative cursor-pointer"
+                      title={lang === "vi" ? "Sao chép kịch bản A" : "Copy Scenario A"}
                     >
                       {copiedScenario === "scenA" ? (
                         <Check className="w-4 h-4 text-secondary" />
@@ -581,7 +592,7 @@ ${currentResult.scenarioB.content}
                 {currentResult.scenarioA.bullets && currentResult.scenarioA.bullets.length > 0 && (
                   <div className="border-t border-outline-variant/60 pt-4">
                     <h5 className="text-[11px] font-bold text-primary uppercase mb-2 tracking-wider">
-                      Key Focus Dimensions
+                      {lang === "vi" ? "Các điểm trọng tâm" : "Key Focus Dimensions"}
                     </h5>
                     <ul className="space-y-2">
                       {currentResult.scenarioA.bullets.map((bullet, idx) => (
@@ -609,8 +620,8 @@ ${currentResult.scenarioB.content}
                           "scenB"
                         )
                       }
-                      className="p-1.5 hover:bg-white/10 rounded text-gray-300 transition-colors"
-                      title="Copy Scenario B"
+                      className="p-1.5 hover:bg-white/10 rounded text-gray-300 transition-colors cursor-pointer"
+                      title={lang === "vi" ? "Sao chép kịch bản B" : "Copy Scenario B"}
                     >
                       {copiedScenario === "scenB" ? (
                         <Check className="w-4 h-4 text-secondary-container" />
@@ -631,7 +642,7 @@ ${currentResult.scenarioB.content}
                 {currentResult.scenarioB.stats && currentResult.scenarioB.stats.length > 0 && (
                   <div className="border-t border-white/10 pt-4">
                     <h5 className="text-[11px] font-bold text-secondary-container uppercase mb-2.5 tracking-wider">
-                      Strategic Accelerators
+                      {lang === "vi" ? "Điểm tăng tốc chiến lược" : "Strategic Accelerators"}
                     </h5>
                     <div className="grid grid-cols-2 gap-3">
                       {currentResult.scenarioB.stats.map((stat, idx) => (
@@ -653,21 +664,22 @@ ${currentResult.scenarioB.content}
 
             <div className="flex flex-wrap justify-between items-center gap-4 border-t border-outline-variant pt-4 mt-6">
               <div className="text-xs text-on-surface-variant">
-                Generated styled content ready to present. Use <strong>Copy</strong> or save it into
-                the archive history!
+                {lang === "vi"
+                  ? <>Nội dung đã sẵn sàng để trình bày. Dùng <strong>Sao chép</strong> hoặc lưu vào kho lưu trữ!</>
+                  : <>Generated styled content ready to present. Use <strong>Copy</strong> or save it into the archive history!</>}
               </div>
               <div className="flex flex-wrap gap-4">
                 <button
                   onClick={handleCopyMarkdown}
                   className="text-primary hover:text-secondary flex items-center gap-1.5 text-xs font-semibold transition-colors cursor-pointer"
                 >
-                  <BookOpen className="w-4 h-4" /> Copy Markdown
+                  <BookOpen className="w-4 h-4" /> {lang === "vi" ? "Sao chép Markdown" : "Copy Markdown"}
                 </button>
                 <button
                   onClick={handleExportPdf}
                   className="text-primary hover:text-secondary flex items-center gap-1.5 text-xs font-semibold transition-colors cursor-pointer"
                 >
-                  <FileDown className="w-4 h-4" /> Download PDF
+                  <FileDown className="w-4 h-4" /> {lang === "vi" ? "Tải PDF" : "Download PDF"}
                 </button>
                 <button
                   onClick={() => {
@@ -675,17 +687,17 @@ ${currentResult.scenarioB.content}
                       `[${currentResult.scenarioA.label}]\n${currentResult.scenarioA.title}\n${currentResult.scenarioA.content}\n\n[${currentResult.scenarioB.label}]\n${currentResult.scenarioB.title}\n${currentResult.scenarioB.content}`,
                       "full"
                     );
-                    showNotification("Full pitch suite copied to clipboard!");
+                    showNotification(lang === "vi" ? "Đã sao chép toàn bộ bộ pitch!" : "Full pitch suite copied to clipboard!");
                   }}
                   className="text-primary hover:text-secondary flex items-center gap-1.5 text-xs font-semibold transition-colors cursor-pointer"
                 >
-                  <Share2 className="w-4 h-4" /> Share Suite
+                  <Share2 className="w-4 h-4" /> {lang === "vi" ? "Chia sẻ bộ pitch" : "Share Suite"}
                 </button>
                 <button
                   onClick={() => setActiveTab("analytics")}
                   className="text-primary hover:text-secondary flex items-center gap-1.5 text-xs font-semibold transition-colors cursor-pointer"
                 >
-                  <TrendingUp className="w-4 h-4" /> Match Analytics
+                  <TrendingUp className="w-4 h-4" /> {lang === "vi" ? "Xem phân tích" : "Match Analytics"}
                 </button>
               </div>
             </div>

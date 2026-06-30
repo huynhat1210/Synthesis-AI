@@ -9,13 +9,16 @@ import React from "react";
 import { TrendingUp, Users, Rocket, CheckCircle, AlertCircle, Award } from "lucide-react";
 import type { MasterProfile, SavedPitch } from "@/types";
 import { cn } from "@/lib/utils";
+import { translations, type Language } from "@/lib/translations";
 
 interface AnalyticsViewProps {
   profile: MasterProfile;
   savedPitches: SavedPitch[];
+  lang: Language;
 }
 
-export function AnalyticsView({ profile, savedPitches }: AnalyticsViewProps) {
+export function AnalyticsView({ profile, savedPitches, lang }: AnalyticsViewProps) {
+  const t = translations[lang];
   const latestPitch = savedPitches[0];
   const analysis = latestPitch?.pitch?.matchAnalysis;
   const alignmentScore = analysis ? analysis.alignmentScore : 0;
@@ -33,9 +36,9 @@ export function AnalyticsView({ profile, savedPitches }: AnalyticsViewProps) {
   return (
     <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm space-y-6 animate-fade-in">
       <div className="border-b border-outline-variant pb-4">
-        <h2 className="text-xl font-bold font-geist text-primary">SYNTHESIS MATCH ANALYTICS</h2>
+        <h2 className="text-xl font-bold font-geist text-primary">{t.analyticsHeader}</h2>
         <p className="text-sm text-on-surface-variant">
-          Intelligent insight mapping your core profile skills with generated narrative pitches.
+          {t.analyticsDesc}
         </p>
       </div>
 
@@ -44,37 +47,37 @@ export function AnalyticsView({ profile, savedPitches }: AnalyticsViewProps) {
         <div className="border border-outline-variant rounded-xl p-5 bg-surface animate-fade-in">
           <TrendingUp className="w-8 h-8 text-secondary mb-3" />
           <span className="text-xs text-on-surface-variant uppercase font-bold tracking-wider">
-            Total Synthesized Pitches
+            {t.totalPitches}
           </span>
           <h3 className="text-3xl font-bold font-geist text-primary mt-1">{savedPitches.length}</h3>
           <p className="text-[11px] text-on-surface-variant mt-2">
-            Active templates saved in local PostgreSQL database.
+            {lang === "vi" ? "Mẫu hoạt động được lưu trong cơ sở dữ liệu." : "Active templates saved in local PostgreSQL database."}
           </p>
         </div>
         {/* Stat B */}
         <div className="border border-outline-variant rounded-xl p-5 bg-surface animate-fade-in" style={{ animationDelay: "100ms" }}>
           <Users className="w-8 h-8 text-secondary mb-3" />
           <span className="text-xs text-on-surface-variant uppercase font-bold tracking-wider">
-            AI Target Match Score
+            {t.averageScore}
           </span>
           <h3 className="text-3xl font-bold font-geist text-primary mt-1">
             {alignmentScore > 0 ? `${alignmentScore}%` : "—"}
           </h3>
           <p className="text-[11px] text-on-surface-variant mt-2">
             {analysis
-              ? `Suitability score for: "${latestPitch.context.targetAudience.slice(0, 30)}..."`
-              : "Generate a pitch to compute match alignment metrics."}
+              ? `${lang === "vi" ? "Điểm phù hợp với:" : "Suitability score for:"} "${latestPitch.context.targetAudience.slice(0, 30)}..."`
+              : (lang === "vi" ? "Tạo bài pitch để tính toán chỉ số tương thích." : "Generate a pitch to compute match alignment metrics.")}
           </p>
         </div>
         {/* Stat C */}
         <div className="border border-outline-variant rounded-xl p-5 bg-surface animate-fade-in" style={{ animationDelay: "200ms" }}>
           <Rocket className="w-8 h-8 text-secondary mb-3" />
           <span className="text-xs text-on-surface-variant uppercase font-bold tracking-wider">
-            Featured Core Skills
+            {lang === "vi" ? "Kỹ Năng Nổi Bật" : "Featured Core Skills"}
           </span>
           <h3 className="text-3xl font-bold font-geist text-primary mt-1">{profile.skills.length}</h3>
           <p className="text-[11px] text-on-surface-variant mt-2">
-            Unique professional tags driving AI prompt generation.
+            {lang === "vi" ? "Các thẻ kỹ năng chuyên môn thúc đẩy AI tạo prompt." : "Unique professional tags driving AI prompt generation."}
           </p>
         </div>
       </div>
@@ -82,9 +85,11 @@ export function AnalyticsView({ profile, savedPitches }: AnalyticsViewProps) {
       {/* SVG Historical Score Trend Chart */}
       <div className="border border-outline-variant rounded-xl p-6 bg-surface space-y-4 animate-fade-in">
         <div>
-          <h3 className="text-sm font-bold text-primary">Alignment Score History Trend</h3>
+          <h3 className="text-sm font-bold text-primary">
+            {lang === "vi" ? "Xu Hướng Lịch Sử Điểm Tương Thích" : "Alignment Score History Trend"}
+          </h3>
           <p className="text-[11px] text-on-surface-variant">
-            Match score optimization progression over generated pitch iterations.
+            {lang === "vi" ? "Tiến độ tối ưu hóa điểm qua các lần tạo bài pitch." : "Match score optimization progression over generated pitch iterations."}
           </p>
         </div>
 
@@ -171,9 +176,13 @@ export function AnalyticsView({ profile, savedPitches }: AnalyticsViewProps) {
         ) : (
           <div className="text-center py-12 border border-dashed border-outline-variant rounded-xl bg-surface-container-low/30">
             <TrendingUp className="w-10 h-10 text-outline mx-auto mb-2" />
-            <h4 className="text-xs font-bold text-primary mb-1">No Historical Trend Data</h4>
+            <h4 className="text-xs font-bold text-primary mb-1">
+              {lang === "vi" ? "Chưa Có Dữ Liệu Lịch Sử" : "No Historical Trend Data"}
+            </h4>
             <p className="text-[10px] text-on-surface-variant max-w-xs mx-auto">
-              Generate and save your first context-aware proposal pitch to start tracking your professional suitability score progression.
+              {lang === "vi"
+                ? "Tạo và lưu bài pitch đầu tiên để bắt đầu theo dõi điểm tương thích chuyên môn của bạn."
+                : "Generate and save your first context-aware proposal pitch to start tracking your professional suitability score progression."}
             </p>
           </div>
         )}
@@ -186,7 +195,7 @@ export function AnalyticsView({ profile, savedPitches }: AnalyticsViewProps) {
           <div className="border border-outline-variant rounded-xl p-6 bg-surface-container-low/30 space-y-4">
             <h3 className="text-sm font-bold text-primary flex items-center gap-2 uppercase tracking-wide">
               <CheckCircle className="w-5 h-5 text-secondary" />
-              Primary Alignment Strengths
+              {t.strengthsLabel}
             </h3>
             <ul className="space-y-3">
               {analysis.strengths.map((strength, idx) => (
@@ -204,7 +213,7 @@ export function AnalyticsView({ profile, savedPitches }: AnalyticsViewProps) {
           <div className="border border-outline-variant rounded-xl p-6 bg-surface-container-low/30 space-y-4">
             <h3 className="text-sm font-bold text-primary flex items-center gap-2 uppercase tracking-wide">
               <AlertCircle className="w-5 h-5 text-error" />
-              Identified Profile Gaps & Advice
+              {t.gapsLabel}
             </h3>
             <ul className="space-y-3">
               {analysis.gaps.map((gap, idx) => (
@@ -224,7 +233,7 @@ export function AnalyticsView({ profile, savedPitches }: AnalyticsViewProps) {
       <div className="border border-outline-variant rounded-xl p-6 bg-surface space-y-4 animate-fade-in">
         <h3 className="text-sm font-bold text-primary flex items-center gap-2 uppercase tracking-wide">
           <Award className="w-5 h-5 text-secondary" />
-          Active Profile Skills Summary
+          {lang === "vi" ? "Tóm Tắt Kỹ Năng Đang Hoạt Động" : "Active Profile Skills Summary"}
         </h3>
         <div className="space-y-3">
           {profile.skills.length > 0 ? (
@@ -244,14 +253,16 @@ export function AnalyticsView({ profile, savedPitches }: AnalyticsViewProps) {
                         : "bg-surface text-on-surface-variant/70 border-outline-variant"
                     )}
                   >
-                    👤 {skill} {isActiveInLatest ? "• Active" : ""}
+                    👤 {skill} {isActiveInLatest ? `• ${lang === "vi" ? "Đang dùng" : "Active"}` : ""}
                   </span>
                 );
               })}
             </div>
           ) : (
             <p className="text-xs text-on-surface-variant">
-              Add skills to your Master Profile to see them summarized here.
+              {lang === "vi"
+                ? "Thêm kỹ năng vào hồ sơ Master để xem chúng được tóm tắt tại đây."
+                : "Add skills to your Master Profile to see them summarized here."}
             </p>
           )}
         </div>

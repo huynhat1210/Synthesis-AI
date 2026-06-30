@@ -40,6 +40,7 @@ import { starPitchAction, deletePitchAction } from "@/actions/managePitches";
 import { parsePdfAction } from "@/actions/parsePdf";
 import { createProfileAction, selectProfileAction } from "@/actions/manageProfiles";
 import { cn } from "@/lib/utils";
+import { translations, type Language } from "@/lib/translations";
 
 // View Subcomponents
 import { DashboardView } from "@/components/dashboard/DashboardView";
@@ -122,6 +123,26 @@ export function DashboardClient({
   initialProfiles,
   hasApiKey,
 }: DashboardClientProps) {
+  // i18n Language configuration
+  const [lang, setLang] = useState<Language>("vi");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedLang = localStorage.getItem("pitch_lang") as Language;
+      if (savedLang === "en" || savedLang === "vi") {
+        setLang(savedLang);
+      }
+    }
+  }, []);
+
+  const handleToggleLang = () => {
+    const nextLang = lang === "vi" ? "en" : "vi";
+    setLang(nextLang);
+    localStorage.setItem("pitch_lang", nextLang);
+  };
+
+  const t = translations[lang];
+
   // Navigation active tab
   const [activeTab, setActiveTab] = useState<
     "dashboard" | "profile" | "projects" | "pitches" | "analytics" | "settings" | "help"
@@ -432,13 +453,13 @@ export function DashboardClient({
 
   const handleGeneratePitch = async () => {
     if (!inputs.targetAudience.trim()) {
-      showNotification("Please state your target audience.", "info");
+      showNotification(lang === "vi" ? "Vui lòng mô tả khách hàng mục tiêu." : "Please state your target audience.", "info");
       return;
     }
 
     setLoading(true);
     try {
-      const res = await generatePitchAction(inputs);
+      const res = await generatePitchAction({ ...inputs, lang });
       if (!res.data) {
         throw new Error(res.error ?? "Failed to communicate with generation engine.");
       }
@@ -449,7 +470,12 @@ export function DashboardClient({
       if (res.error) {
         showNotification(res.error, "info");
       } else {
-        showNotification("AI pitch created and loaded in live preview!", "success");
+        showNotification(
+          lang === "vi"
+            ? "Đã tạo bản Pitch bằng AI và hiển thị ở khung xem trước!"
+            : "AI pitch created and loaded in live preview!",
+          "success"
+        );
       }
     } catch (err: any) {
       console.error(err);
@@ -469,7 +495,11 @@ export function DashboardClient({
     );
 
     if (alreadySaved) {
-      showNotification("Pitch is already saved in the history archive!");
+      showNotification(
+        lang === "vi"
+          ? "Bài Pitch này đã được lưu trong Lịch sử trước đó!"
+          : "Pitch is already saved in the history archive!"
+      );
       return;
     }
 
@@ -608,14 +638,14 @@ export function DashboardClient({
         <div className="px-6 mb-6">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-              Active Profile
+              {t.activeProfile}
             </span>
             <button
               onClick={handleCreateProfile}
               className="text-[10px] text-secondary hover:underline font-bold uppercase flex items-center gap-0.5 cursor-pointer"
               title="Create New Profile"
             >
-              <Plus className="w-3 h-3" /> New
+              <Plus className="w-3 h-3" /> {lang === "vi" ? "MỚI" : "NEW"}
             </button>
           </div>
           <select
@@ -636,12 +666,16 @@ export function DashboardClient({
             onClick={() => {
               setInputs(INITIAL_INPUTS);
               setCurrentResult(null); // Clear live pitch state as requested
-              showNotification("Reset inputs. Ready for a new pitch context!");
+              showNotification(
+                lang === "vi"
+                  ? "Đã đặt lại các ô nhập liệu. Sẵn sàng tạo bài pitch mới!"
+                  : "Reset inputs. Ready for a new pitch context!"
+              );
               changeTab("dashboard");
             }}
             className="w-full bg-primary-container hover:bg-primary-container/95 text-on-primary py-3 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md transition-all active:scale-98 cursor-pointer"
           >
-            New Pitch
+            {t.newPitchBtn}
           </button>
         </div>
 
@@ -657,7 +691,7 @@ export function DashboardClient({
               )}
             >
               <Home className="w-5 h-5 text-primary" />
-              <span className="text-sm">Dashboard</span>
+              <span className="text-sm">{t.tabDashboard}</span>
             </button>
           </li>
           <li>
@@ -671,7 +705,7 @@ export function DashboardClient({
               )}
             >
               <User className="w-5 h-5 text-primary" />
-              <span className="text-sm">Master Profile</span>
+              <span className="text-sm">{t.tabProfile}</span>
             </button>
           </li>
           <li>
@@ -685,7 +719,7 @@ export function DashboardClient({
               )}
             >
               <Briefcase className="w-5 h-5 text-primary" />
-              <span className="text-sm">Projects ({profile.projects.length})</span>
+              <span className="text-sm">{t.tabProjects} ({profile.projects.length})</span>
             </button>
           </li>
           <li>
@@ -699,7 +733,7 @@ export function DashboardClient({
               )}
             >
               <Sparkles className="w-5 h-5 text-primary" />
-              <span className="text-sm">Generated Pitches</span>
+              <span className="text-sm">{t.tabPitches}</span>
               {savedPitches.length > 0 && (
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 bg-secondary text-on-secondary text-[10px] font-bold px-2 py-0.5 rounded-full">
                   {savedPitches.length}
@@ -718,7 +752,7 @@ export function DashboardClient({
               )}
             >
               <TrendingUp className="w-5 h-5 text-primary" />
-              <span className="text-sm">Analytics</span>
+              <span className="text-sm">{t.tabAnalytics}</span>
             </button>
           </li>
           <li>
@@ -732,7 +766,7 @@ export function DashboardClient({
               )}
             >
               <Settings className="w-5 h-5 text-primary" />
-              <span className="text-sm">Settings</span>
+              <span className="text-sm">{t.tabSettings}</span>
             </button>
           </li>
           <li>
@@ -746,7 +780,7 @@ export function DashboardClient({
               )}
             >
               <HelpCircle className="w-5 h-5 text-primary" />
-              <span className="text-sm">Help</span>
+              <span className="text-sm">{t.tabHelp}</span>
             </button>
           </li>
         </ul>
@@ -780,12 +814,12 @@ export function DashboardClient({
             {hasApiKey ? (
               <span className="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.05)] transition-all">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]"></span>
-                Gemini AI Connected (Online)
+                {t.geminiOnline}
               </span>
             ) : (
               <span className="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20 shadow-[0_0_12px_rgba(245,158,11,0.05)] transition-all">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shadow-[0_0_8px_#f59e0b]"></span>
-                Local Simulation Mode (Offline Sandbox)
+                {t.geminiOffline}
               </span>
             )}
           </div>
@@ -798,15 +832,25 @@ export function DashboardClient({
                 onChange={(e) => changeTab(e.target.value as any)}
                 className="bg-surface-container-low text-primary text-xs font-semibold px-3 py-1.5 rounded-lg outline-none border border-outline-variant"
               >
-                <option value="dashboard">🏠 Dashboard</option>
-                <option value="profile">👤 Master Profile</option>
-                <option value="projects">💼 Projects</option>
-                <option value="pitches">✨ Saved Pitches</option>
-                <option value="analytics">📈 Analytics</option>
-                <option value="settings">⚙️ Settings</option>
-                <option value="help">❓ Help</option>
+                <option value="dashboard">🏠 {t.tabDashboard}</option>
+                <option value="profile">👤 {t.tabProfile}</option>
+                <option value="projects">💼 {t.tabProjects}</option>
+                <option value="pitches">✨ {t.tabPitches}</option>
+                <option value="analytics">📈 {t.tabAnalytics}</option>
+                <option value="settings">⚙️ {t.tabSettings}</option>
+                <option value="help">❓ {t.tabHelp}</option>
               </select>
             </div>
+
+            {/* i18n Language Toggle Button */}
+            <button
+              onClick={handleToggleLang}
+              className="px-3 py-1.5 border border-outline-variant hover:border-outline rounded-full text-xs font-bold text-primary bg-surface flex items-center gap-1 cursor-pointer transition-all hover:bg-surface-container-low"
+              title={lang === "vi" ? "Switch to English" : "Chuyển sang Tiếng Việt"}
+            >
+              <span className="text-xs">🌐</span>
+              <span>{lang === "vi" ? "EN" : "VI"}</span>
+            </button>
 
             <div className="relative">
               <button
@@ -832,7 +876,9 @@ export function DashboardClient({
                     className="absolute right-0 mt-2 w-80 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-xl z-50 overflow-hidden"
                   >
                     <div className="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
-                      <span className="text-xs font-bold text-primary uppercase tracking-wider">Thông báo gần đây</span>
+                      <span className="text-xs font-bold text-primary uppercase tracking-wider">
+                        {lang === "vi" ? "Thông báo gần đây" : "Recent Notifications"}
+                      </span>
                       <button
                         onClick={() => {
                           setUnreadNotifications(false);
@@ -840,18 +886,22 @@ export function DashboardClient({
                         }}
                         className="text-[10px] text-secondary font-bold uppercase hover:underline cursor-pointer"
                       >
-                        Đóng
+                        {lang === "vi" ? "Đóng" : "Close"}
                       </button>
                     </div>
                     <div className="max-h-64 overflow-y-auto divide-y divide-outline-variant/50">
                       <div className="p-3.5 hover:bg-surface-container-low transition-colors text-left">
-                        <p className="text-xs font-semibold text-primary">Kết nối Gemini AI</p>
+                        <p className="text-xs font-semibold text-primary">
+                          {lang === "vi" ? "Kết nối Gemini AI" : "Gemini AI Connection"}
+                        </p>
                         <p className="text-[10px] text-on-surface-variant mt-0.5 leading-relaxed">
                           {hasApiKey
-                            ? "Gemini AI đã được kết nối trực tuyến thành công. Sẵn sàng tạo các bản Pitch chất lượng cao."
-                            : "Đang chạy ở chế độ Chạy thử Local (Mã Gemini API chưa cấu hình)."}
+                            ? (lang === "vi" ? "Gemini AI đã được kết nối trực tuyến thành công. Sẵn sàng tạo các bản Pitch chất lượng cao." : "Gemini AI connected successfully online. Ready to generate high quality proposals.")
+                            : (lang === "vi" ? "Đang chạy ở chế độ Chạy thử Local (Mã Gemini API chưa cấu hình)." : "Running in offline Sandbox mode.")}
                         </p>
-                        <span className="text-[9px] text-outline font-medium block mt-1">Vừa xong</span>
+                        <span className="text-[9px] text-outline font-medium block mt-1">
+                          {lang === "vi" ? "Vừa xong" : "Just now"}
+                        </span>
                       </div>
                       <div className="p-3.5 hover:bg-surface-container-low transition-colors text-left">
                         <p className="text-xs font-semibold text-primary">Trình quản lý hồ sơ</p>
@@ -949,6 +999,7 @@ export function DashboardClient({
                   renderIcon={renderIcon}
                   handlePdfUpload={handlePdfUpload}
                   parsingPdf={parsingPdf}
+                  lang={lang}
                 />
               )}
 
@@ -963,6 +1014,7 @@ export function DashboardClient({
                   setActiveTab={changeTab}
                   showNotification={showNotification}
                   syncProfileToServer={syncProfileToServer}
+                  lang={lang}
                 />
               )}
 
@@ -987,6 +1039,7 @@ export function DashboardClient({
                   handleDeleteProject={handleDeleteProject}
                   setEditingProject={setEditingProject}
                   mockImages={MOCK_IMAGES}
+                  lang={lang}
                 />
               )}
 
@@ -997,6 +1050,7 @@ export function DashboardClient({
                   handleStarSavedPitch={handleStarSavedPitch}
                   copyToClipboard={copyToClipboard}
                   handleDeleteSavedPitch={handleDeleteSavedPitch}
+                  lang={lang}
                 />
               )}
 
@@ -1004,15 +1058,17 @@ export function DashboardClient({
                 <AnalyticsView
                   profile={profile}
                   savedPitches={savedPitches}
+                  lang={lang}
                 />
               )}
 
               {activeTab === "settings" && (
                 <SettingsView
                   hasApiKey={hasApiKey}
+                  lang={lang}
                   handleResetState={async () => {
                     if (
-                      confirm("Are you sure you want to reset everything back to defaults?")
+                      confirm(lang === "vi" ? "Bạn có chắc muốn đặt lại tất cả về mặc định không?" : "Are you sure you want to reset everything back to defaults?")
                     ) {
                       const defaults: MasterProfile = {
                         fullName: "Jane Doe",
@@ -1052,7 +1108,7 @@ export function DashboardClient({
                 />
               )}
 
-              {activeTab === "help" && <HelpView />}
+              {activeTab === "help" && <HelpView lang={lang} />}
             </motion.div>
           </AnimatePresence>
         </main>

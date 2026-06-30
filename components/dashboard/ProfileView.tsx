@@ -7,6 +7,7 @@
 import React from "react";
 import { X } from "lucide-react";
 import type { MasterProfile } from "@/types";
+import { translations, type Language } from "@/lib/translations";
 
 interface ProfileViewProps {
   profile: MasterProfile;
@@ -18,6 +19,7 @@ interface ProfileViewProps {
   setActiveTab: (tab: any) => void;
   showNotification: (msg: string, type?: "success" | "info" | "error") => void;
   syncProfileToServer: (p: MasterProfile) => void;
+  lang: Language;
 }
 
 export function ProfileView({
@@ -30,14 +32,20 @@ export function ProfileView({
   setActiveTab,
   showNotification,
   syncProfileToServer,
+  lang,
 }: ProfileViewProps) {
+  const t = translations[lang];
+
   return (
     <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm space-y-6 animate-fade-in">
       <div className="border-b border-outline-variant pb-4">
-        <h2 className="text-xl font-bold font-geist text-primary">MASTER PROFILE CONTEXT</h2>
+        <h2 className="text-xl font-bold font-geist text-primary">
+          {lang === "vi" ? "HỒ SƠ NĂNG LỰC MASTER" : "MASTER PROFILE CONTEXT"}
+        </h2>
         <p className="text-sm text-on-surface-variant">
-          Design the foundation of your expert background to align with all generated narrative
-          streams.
+          {lang === "vi"
+            ? "Thiết lập nền tảng chuyên môn của bạn để đồng bộ với tất cả các luồng bài Pitch được tạo ra."
+            : "Design the foundation of your expert background to align with all generated narrative streams."}
         </p>
       </div>
 
@@ -45,7 +53,7 @@ export function ProfileView({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-wide">
-              Full Professional Name
+              {lang === "vi" ? "Họ và Tên Đầy Đủ" : "Full Professional Name"}
             </label>
             <input
               type="text"
@@ -56,7 +64,7 @@ export function ProfileView({
           </div>
           <div>
             <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-wide">
-              Job Designation / Title
+              {lang === "vi" ? "Chức Danh / Vị Trí Công Việc" : "Job Designation / Title"}
             </label>
             <input
               type="text"
@@ -69,21 +77,21 @@ export function ProfileView({
 
         <div>
           <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-wide">
-            Professional Bio Summary
+            {lang === "vi" ? "Tóm Tắt Tiểu Sử Chuyên Môn" : "Professional Bio Summary"}
           </label>
           <textarea
             value={profile.bio}
             onChange={(e) => setProfileState({ ...profile, bio: e.target.value })}
             rows={5}
             className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 text-sm focus:border-secondary focus:ring-2 focus:ring-secondary/10 outline-none leading-relaxed"
-            placeholder="Detail your professional highlights..."
+            placeholder={lang === "vi" ? "Mô tả chi tiết các điểm nổi bật trong sự nghiệp của bạn..." : "Detail your professional highlights..."}
           />
         </div>
 
         {/* Manage Skills directly */}
         <div>
           <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-wide">
-            Expert Skills Tags
+            {lang === "vi" ? "Thẻ Kỹ Năng Chuyên Gia" : "Expert Skills Tags"}
           </label>
           <div className="flex flex-wrap gap-2 mb-3 p-3 border border-outline-variant rounded-lg bg-surface">
             {profile.skills.map((skill) => (
@@ -95,7 +103,7 @@ export function ProfileView({
                 <button
                   type="button"
                   onClick={() => handleRemoveSkill(skill)}
-                  className="text-on-surface-variant hover:text-error"
+                  className="text-on-surface-variant hover:text-error cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -107,28 +115,28 @@ export function ProfileView({
               type="text"
               value={newSkill}
               onChange={(e) => setNewSkill(e.target.value)}
-              placeholder="e.g. Next.js, Strategic Modeling, Venture Capital"
+              placeholder={lang === "vi" ? "Ví dụ: Next.js, Tư vấn chiến lược, Vốn đầu tư mạo hiểm" : "e.g. Next.js, Strategic Modeling, Venture Capital"}
               className="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-secondary outline-none w-full max-w-xs"
             />
             <button
               type="submit"
-              className="bg-secondary text-on-secondary px-4 py-2 rounded-lg text-xs font-semibold"
+              className="bg-secondary text-on-secondary px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer hover:bg-secondary/90 transition-colors"
             >
-              Add Tag
-                        </button>
+              {lang === "vi" ? "Thêm" : "Add Tag"}
+            </button>
           </form>
         </div>
 
         <div className="pt-4 border-t border-outline-variant">
           <button
             onClick={async () => {
-              showNotification("Master Profile updated successfully!");
+              showNotification(t.profileSaved);
               setActiveTab("dashboard");
               await syncProfileToServer(profile);
             }}
-            className="bg-primary-container text-on-primary px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider"
+            className="bg-primary-container text-on-primary px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-primary-container/90 transition-colors"
           >
-            Save and Return
+            {lang === "vi" ? "Lưu và Quay Lại" : "Save and Return"}
           </button>
         </div>
       </div>

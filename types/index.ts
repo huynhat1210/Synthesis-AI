@@ -54,6 +54,8 @@ export interface ClientContext {
   selectedSkills?: string[];
   /** Slider value from 0 to 100 where 0 is Formal, 100 is Casual */
   toneValue?: number;
+  /** Selected target language for generation (en or vi) */
+  lang?: "en" | "vi";
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

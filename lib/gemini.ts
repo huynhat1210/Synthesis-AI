@@ -276,12 +276,21 @@ SCENARIO REQUIREMENTS
 • Scenario B — Energetic & visionary: modern, product-focused, startup-friendly.
   Include 2–3 icon-tagged stat highlights (icons: rocket, lightbulb, shield, zap,
   users, trending-up, award, heart, target).
-• Luôn trả về kết quả bằng Tiếng Việt với chuẩn Unicode dựng sẵn (Precomposed Unicode) để tránh lỗi hiển thị font.
+${
+  context.lang === "en"
+    ? `• You MUST generate all text (scenario labels, titles, content, bullets, stats, strengths, and gaps) strictly in English.
+• Every pitch scenario must end with a strong, professional call-to-action (CTA) statement.
+• Adjust the tone of the English text according to the Tone Value (${context.toneValue !== undefined ? context.toneValue : 50}/100):
+  - 0 to 30 (Formal): Use extremely polite, corporate, professional language (e.g., "Dear", "Sincerely", "I/We propose", "Your organization").
+  - 31 to 70 (Balanced): Use professional, warm, natural language (e.g., "Hi", "I proposal to build", "Let's discuss").
+  - 71 to 100 (Casual): Use high-energy, friendly, startup-oriented language (e.g., "Hey there!", "Let's build something awesome!", "Let's connect!").`
+    : `• Luôn trả về kết quả bằng Tiếng Việt với chuẩn Unicode dựng sẵn (Precomposed Unicode) để tránh lỗi hiển thị font.
 • Mỗi bản pitch bắt buộc phải kết thúc bằng một câu Call-To-Action (Kêu gọi hành động) mạnh mẽ và chuyên nghiệp.
 • Điều chỉnh văn phong Tiếng Việt của bản pitch bám sát giá trị Tone Value (${context.toneValue !== undefined ? context.toneValue : 50}/100):
   - Từ 0 đến 30 (Formal): Sử dụng văn phong cực kỳ trang trọng, lịch sự, chuẩn mực công sở (ví dụ: xưng "Tôi", gọi "Quý công ty", "Kính gửi", "Trân trọng").
   - Từ 31 đến 70 (Balanced): Sử dụng văn phong trung hòa, chuyên nghiệp, tự nhiên nhưng lịch sự (ví dụ: xưng "Tôi" hoặc "Mình", gọi "Bạn", "Chào bạn").
-  - Từ 71 đến 100 (Casual): Sử dụng văn phong trẻ trung, tràn đầy năng lượng, thân thiện, phong cách startup sáng tạo (ví dụ: xưng "Mình", dùng từ ngữ năng động, kích thích tư duy sáng tạo).
+  - Từ 71 đến 100 (Casual): Sử dụng văn phong trẻ trung, tràn đầy năng lượng, thân thiện, phong cách startup sáng tạo (ví dụ: xưng "Mình", dùng từ ngữ năng động, kích thích tư duy sáng tạo).`
+}
 
 ═══════════════════════════════
 ALIGNMENT SCORE REQUIREMENTS

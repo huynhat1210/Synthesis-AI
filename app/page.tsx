@@ -13,10 +13,30 @@ import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import { ArrowRight, Sparkles, Sliders, TrendingUp, CheckCircle, Play, X, Zap, Check, RotateCcw, HelpCircle, Bell, Plus, UploadCloud } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { translations } from "@/lib/translations";
 
 export default function RootPage() {
   const { userId } = useAuth();
   const dashboardLink = userId ? "/dashboard" : "/dashboard";
+
+  const [lang, setLang] = useState<"vi" | "en">("vi");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedLang = localStorage.getItem("pitch_lang") as "vi" | "en";
+      if (savedLang === "en" || savedLang === "vi") {
+        setLang(savedLang);
+      }
+    }
+  }, []);
+
+  const handleToggleLang = () => {
+    const nextLang = lang === "vi" ? "en" : "vi";
+    setLang(nextLang);
+    localStorage.setItem("pitch_lang", nextLang);
+  };
+
+  const t = translations[lang];
 
   // ── DEMO SIMULATOR STATE (LOOPING CONTINUOUSLY) ─────────────────────
   const [demoStep, setDemoStep] = useState(0); // 0: Idle, 1: Typing, 2: Skills, 3: Slider, 4: Generating, 5: Done
@@ -114,17 +134,33 @@ export default function RootPage() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
-          <a href="#features" className="hover:text-teal-600 transition-colors">Features</a>
-          <a href="#pricing" className="hover:text-teal-600 transition-colors">Pricing</a>
-          <a href="#faq" className="hover:text-teal-600 transition-colors">FAQ</a>
+          <a href="#features" className="hover:text-teal-600 transition-colors">
+            {lang === "vi" ? "Tính năng" : "Features"}
+          </a>
+          <a href="#pricing" className="hover:text-teal-600 transition-colors">
+            {lang === "vi" ? "Bảng giá" : "Pricing"}
+          </a>
+          <a href="#faq" className="hover:text-teal-600 transition-colors">
+            FAQ
+          </a>
         </nav>
 
-        <div>
+        <div className="flex items-center gap-3">
+          {/* i18n Language Toggle Button */}
+          <button
+            onClick={handleToggleLang}
+            className="px-3 py-1.5 border border-slate-200 hover:border-slate-300 rounded-full text-xs font-bold text-slate-700 bg-white shadow-sm flex items-center gap-1 cursor-pointer transition-all hover:bg-slate-50"
+            title={lang === "vi" ? "Switch to English" : "Chuyển sang Tiếng Việt"}
+          >
+            <span className="text-sm">🌐</span>
+            <span>{lang === "vi" ? "EN" : "VI"}</span>
+          </button>
+          
           <Link
             href={dashboardLink}
             className="inline-flex items-center justify-center bg-teal-800 hover:bg-teal-900 text-white font-semibold text-sm px-6 py-2.5 rounded-full transition-all hover:shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
-            {userId ? "Vào Dashboard" : "Bắt đầu ngay"}
+            {userId ? t.vàoDashboard : t.bắtĐầuNgay}
           </Link>
         </div>
       </header>
@@ -138,11 +174,12 @@ export default function RootPage() {
           className="max-w-4xl flex flex-col items-center"
         >
           <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.1] mb-6 font-geist">
-            Win More Clients with AI-Driven Contextual Pitches
+            {lang === "vi" ? "Chinh Phục Khách Hàng Với Bài Pitch Cá Nhân Hóa Bằng AI" : "Win More Clients with AI-Driven Contextual Pitches"}
           </h1>
           <p className="text-lg md:text-xl text-slate-500 max-w-2xl leading-relaxed mb-10">
-            Elevate your sales strategy. Our intelligence engine analyzes your prospect's unique profile 
-            to generate compelling, targeted pitches in seconds. Stop guessing, start closing.
+            {lang === "vi"
+              ? "Nâng tầm chiến lược kinh doanh. Động cơ trí tuệ nhân tạo phân tích hồ sơ năng lực của bạn để viết những bản đề xuất thuyết phục, nhắm đúng mục tiêu chỉ trong vài giây."
+              : "Elevate your sales strategy. Our intelligence engine analyzes your prospect's unique profile to generate compelling, targeted pitches in seconds. Stop guessing, start closing."}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -150,7 +187,7 @@ export default function RootPage() {
               href={dashboardLink}
               className="inline-flex items-center justify-center bg-teal-800 hover:bg-teal-900 text-white font-semibold px-8 py-3.5 rounded-full transition-all hover:shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer gap-2"
             >
-              <span>{userId ? "Vào Dashboard" : "Bắt đầu ngay"}</span>
+              <span>{userId ? t.vàoDashboard : t.bắtĐầuNgay}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
             <button
@@ -158,14 +195,14 @@ export default function RootPage() {
               className="inline-flex items-center justify-center border border-teal-800 text-teal-800 hover:bg-teal-55 font-semibold px-8 py-3.5 rounded-full transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer gap-2"
             >
               <Play className="w-4 h-4 fill-current shrink-0" />
-              <span>View Demo</span>
+              <span>{t.viewDemo}</span>
             </button>
           </div>
         </motion.div>
         
         {/* Scroll Indicator */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-slate-400 text-xs font-semibold animate-bounce">
-          <span>Cuộn xuống xem tiếp</span>
+          <span>{lang === "vi" ? "Cuộn xuống xem tiếp" : "Scroll down to continue"}</span>
           <div className="w-1.5 h-3 bg-slate-400 rounded-full"></div>
         </div>
       </section>

@@ -10,6 +10,7 @@ import React from "react";
 import { Plus, Edit2, Trash2, Code, Briefcase, AlertCircle, CheckCircle } from "lucide-react";
 import { motion } from "motion/react";
 import type { MasterProfile, Project } from "@/types";
+import { translations, type Language } from "@/lib/translations";
 
 interface ProjectsViewProps {
   profile: MasterProfile;
@@ -31,6 +32,7 @@ interface ProjectsViewProps {
   handleDeleteProject: (id: string) => void;
   setEditingProject: (proj: Project | null) => void;
   mockImages: string[];
+  lang: Language;
 }
 
 export function ProjectsView({
@@ -52,21 +54,24 @@ export function ProjectsView({
   handleSaveProject,
   handleDeleteProject,
   setEditingProject,
+  lang,
 }: ProjectsViewProps) {
+  const t = translations[lang];
+
   return (
     <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm space-y-6 animate-fade-in">
       <div className="flex justify-between items-center border-b border-outline-variant pb-4">
         <div>
-          <h2 className="text-xl font-bold font-geist text-primary">FEATURED PROJECTS</h2>
+          <h2 className="text-xl font-bold font-geist text-primary">{t.featuredProjectsHeader}</h2>
           <p className="text-sm text-on-surface-variant">
-            Featured projects provide proof points for target proposals.
+            {t.featuredProjectsDesc}
           </p>
         </div>
         <button
           onClick={() => openProjectModal()}
           className="bg-secondary text-on-secondary px-4 py-2.5 rounded-lg text-xs font-bold flex items-center gap-1.5 hover:shadow-sm transition-all active:scale-95 cursor-pointer"
         >
-          <Plus className="w-4 h-4" /> Add Project
+          <Plus className="w-4 h-4" /> {t.addProjectBtn}
         </button>
       </div>
 
@@ -80,31 +85,31 @@ export function ProjectsView({
         >
           <h3 className="text-sm font-bold text-primary flex items-center gap-1.5">
             <Edit2 className="w-4 h-4" />
-            {editingProject.id ? "Edit Project Details" : "Add New Featured Project"}
+            {editingProject.id ? t.editProjectDetails : t.addNewProjectDetails}
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-primary mb-1">
-                Project Title
+                {t.projectTitleLabel}
               </label>
               <input
                 type="text"
                 value={projectTitle}
                 onChange={(e) => setProjectTitle(e.target.value)}
-                placeholder="e.g. Enterprise CRM System"
+                placeholder={lang === "vi" ? "Ví dụ: Hệ thống CRM Doanh nghiệp" : "e.g. Enterprise CRM System"}
                 className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-2.5 text-xs focus:border-secondary outline-none"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-primary mb-1">
-                Your Role
+                {t.projectRoleLabel}
               </label>
               <input
                 type="text"
                 value={projectRole}
                 onChange={(e) => setProjectRole(e.target.value)}
-                placeholder="e.g. Lead Architect, Senior Developer"
+                placeholder={lang === "vi" ? "Ví dụ: Trưởng nhóm, Kiến trúc sư hệ thống" : "e.g. Lead Architect, Senior Developer"}
                 className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-2.5 text-xs focus:border-secondary outline-none"
               />
             </div>
@@ -113,7 +118,7 @@ export function ProjectsView({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-primary mb-1">
-                Tech Stack & Tools (comma-separated)
+                {t.projectTagsLabel}
               </label>
               <input
                 type="text"
@@ -125,13 +130,13 @@ export function ProjectsView({
             </div>
             <div>
               <label className="block text-xs font-semibold text-primary mb-1">
-                Impact / Core Metric Result
+                {t.projectOutcomeLabel}
               </label>
               <input
                 type="text"
                 value={projectOutcome}
                 onChange={(e) => setProjectOutcome(e.target.value)}
-                placeholder="e.g. Reduced loading times by 40% and improved security by 99%."
+                placeholder={lang === "vi" ? "Ví dụ: Giảm 40% thời gian tải và tăng 99% bảo mật." : "e.g. Reduced loading times by 40% and improved security by 99%."}
                 className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-2.5 text-xs focus:border-secondary outline-none"
               />
             </div>
@@ -139,25 +144,25 @@ export function ProjectsView({
 
           <div>
             <label className="block text-xs font-semibold text-primary mb-1">
-              Project Description / Outcome Details
+              {t.projectDescLabel}
             </label>
             <input
               type="text"
               value={projectDesc}
               onChange={(e) => setProjectDesc(e.target.value)}
-              placeholder="Provide a general summary of the project architecture and what was built..."
+              placeholder={lang === "vi" ? "Tóm tắt kiến trúc tổng thể và những gì đã xây dựng..." : "Provide a general summary of the project architecture and what was built..."}
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-2.5 text-xs focus:border-secondary outline-none"
             />
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-primary mb-1">
-              The Challenge / Problem Solved (Optional)
+              {t.projectChallengeLabel}
             </label>
             <textarea
               value={projectChallenge}
               onChange={(e) => setProjectChallenge(e.target.value)}
-              placeholder="What was the client's problem or system bottleneck before starting? e.g. System experiencing heavy latency..."
+              placeholder={lang === "vi" ? "Bài toán/vấn đề của khách hàng trước khi bắt đầu dự án là gì?" : "What was the client's problem or system bottleneck before starting?"}
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-2.5 text-xs focus:border-secondary outline-none h-20 resize-none"
             />
           </div>
@@ -167,13 +172,13 @@ export function ProjectsView({
               onClick={() => setEditingProject(null)}
               className="px-3.5 py-2 border border-outline text-primary rounded-lg text-xs font-semibold hover:bg-surface-container-low transition-colors cursor-pointer"
             >
-              Cancel
+              {lang === "vi" ? "Hủy" : "Cancel"}
             </button>
             <button
               onClick={handleSaveProject}
               className="px-3.5 py-2 bg-secondary text-on-secondary rounded-lg text-xs font-bold hover:shadow-sm cursor-pointer"
             >
-              Save Project
+              {lang === "vi" ? "Lưu Dự Án" : "Save Project"}
             </button>
           </div>
         </motion.div>
@@ -203,14 +208,14 @@ export function ProjectsView({
                   <button
                     onClick={() => openProjectModal(proj)}
                     className="p-1.5 rounded-full border border-outline-variant bg-surface text-primary hover:bg-secondary/10 hover:text-secondary transition-colors cursor-pointer"
-                    title="Edit project"
+                    title={lang === "vi" ? "Chỉnh sửa dự án" : "Edit project"}
                   >
                     <Edit2 className="w-3 h-3" />
                   </button>
                   <button
                     onClick={() => handleDeleteProject(proj.id)}
                     className="p-1.5 rounded-full border border-outline-variant bg-surface text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors cursor-pointer"
-                    title="Delete project"
+                    title={lang === "vi" ? "Xóa dự án" : "Delete project"}
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
@@ -243,7 +248,9 @@ export function ProjectsView({
                   <div className="text-[10px] bg-slate-50 p-2 rounded-md border border-slate-100 flex items-start gap-1.5">
                     <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <span className="font-bold text-[9px] text-slate-500 uppercase block leading-none mb-1">Challenge:</span>
+                      <span className="font-bold text-[9px] text-slate-500 uppercase block leading-none mb-1">
+                        {lang === "vi" ? "Thách thức:" : "Challenge:"}
+                      </span>
                       <p className="text-[10px] text-slate-600 leading-normal line-clamp-2">{proj.challenge}</p>
                     </div>
                   </div>
@@ -257,7 +264,9 @@ export function ProjectsView({
                 <div className="flex items-start gap-2 bg-emerald-50 text-emerald-800 text-[10px] p-2 rounded-lg border border-emerald-100 leading-normal">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-extrabold text-[8px] text-emerald-700 uppercase block leading-none mb-0.5">Impact Result:</span>
+                    <span className="font-extrabold text-[8px] text-emerald-700 uppercase block leading-none mb-0.5">
+                      {lang === "vi" ? "Kết quả thực tế:" : "Impact Result:"}
+                    </span>
                     <p className="font-medium text-emerald-900">{proj.outcome}</p>
                   </div>
                 </div>
@@ -268,7 +277,8 @@ export function ProjectsView({
 
         {profile.projects.length === 0 && (
           <div className="col-span-2 text-center py-12 border-2 border-dashed border-outline-variant rounded-xl text-sm text-on-surface-variant">
-            No projects in profile. Add your first project above to serve as a stellar proof point!
+            <p className="font-semibold text-primary mb-1">{t.noProjectsHeader}</p>
+            <p>{t.noProjectsDesc}</p>
           </div>
         )}
       </div>

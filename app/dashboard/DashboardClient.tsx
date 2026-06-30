@@ -177,6 +177,12 @@ export function DashboardClient({
         );
         window.history.replaceState({}, document.title, window.location.pathname);
       }
+
+      const upgrade = urlParams.get("upgrade");
+      if (upgrade === "true") {
+        setShowUpgradeModal(true);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
     }
   }, [lang]);
 

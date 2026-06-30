@@ -727,7 +727,7 @@ export default function RootPage() {
                 </ul>
               </div>
               <Link
-                href={dashboardLink}
+                href="/dashboard?upgrade=true"
                 className="w-full text-center bg-teal-800 hover:bg-teal-900 text-white font-semibold py-2 rounded-full transition-all text-xs cursor-pointer"
               >
                 Bắt đầu ngay

@@ -1,6 +1,6 @@
 /**
  * @file app/page.tsx
- * @description Premium product landing page for PitchPerfect.
+ * @description Premium product landing page for Synthesis AI.
  *              Contains full-screen snap-scrolling sections, custom brand favicon,
  *              modern Framer Motion scroll-triggered animations, and an embedded
  *              self-running loop UI Dashboard Simulator matching user screenshots.
@@ -125,11 +125,11 @@ export default function RootPage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/favicon.png"
-            alt="PitchPerfect Logo"
+            alt="Synthesis AI Logo"
             className="w-8 h-8 rounded-lg object-contain bg-slate-100 p-0.5 border border-slate-200/60"
           />
           <span className="font-extrabold text-xl tracking-tight text-slate-800">
-            PitchPerfect
+            Synthesis AI
           </span>
         </Link>
 
@@ -329,7 +329,7 @@ export default function RootPage() {
                 {/* TopNavBar */}
                 <header className="h-10 w-full flex justify-between items-center px-4 border-b border-slate-200 bg-white shrink-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-extrabold text-[10px] text-slate-800 tracking-tight">PitchPerfect</span>
+                    <span className="font-extrabold text-[10px] text-slate-800 tracking-tight">Synthesis AI</span>
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-full text-[8px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
                       <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
                       Gemini AI Connected (Online)
@@ -822,12 +822,12 @@ export default function RootPage() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/favicon.png"
-                alt="PitchPerfect Logo"
+                alt="Synthesis AI Logo"
                 className="w-6 h-6 rounded object-contain bg-slate-100 p-0.5 border border-slate-200/60"
               />
-              <span className="font-extrabold text-base text-slate-800">PitchPerfect</span>
+              <span className="font-extrabold text-base text-slate-800">Synthesis AI</span>
             </div>
-            <p className="text-[10px] text-slate-400">© 2026 PitchPerfect by Synthesis AI. All rights reserved.</p>
+            <p className="text-[10px] text-slate-400">© 2026 Synthesis AI. All rights reserved.</p>
           </div>
           <div className="flex gap-6 text-[11px] text-slate-500 font-semibold">
             <a href="#" className="hover:text-teal-600">Privacy Policy</a>

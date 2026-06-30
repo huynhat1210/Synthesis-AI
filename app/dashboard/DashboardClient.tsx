@@ -1004,7 +1004,7 @@ export function DashboardClient({
           <div className="flex items-center gap-3 w-1/2">
             <Link href="/" className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer">
               <h1 className="text-lg font-bold font-geist text-primary tracking-tight">
-                PitchPerfect
+                Synthesis AI
               </h1>
             </Link>
 

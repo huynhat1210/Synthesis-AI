@@ -32,7 +32,7 @@ export function TopBar({ hasApiKey = false }: TopBarProps) {
       <div className="flex items-center gap-3">
         <Sparkles className="w-6 h-6 text-secondary" />
         <h1 className="text-lg font-bold font-geist text-primary tracking-tight">
-          PitchPerfect
+          Synthesis AI
         </h1>
         <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-container-low text-primary-container border border-outline-variant">
           <span

@@ -402,14 +402,8 @@ ${currentResult.scenarioB.content}
                 {profile.projects.slice(0, 2).map((proj) => (
                   <div
                     key={proj.id}
-                    className="border border-outline-variant rounded-lg p-3 flex items-start gap-3 bg-surface hover:bg-surface-container-low transition-colors"
+                    className="border border-outline-variant rounded-lg p-3 flex flex-col justify-between bg-surface hover:bg-surface-container-low transition-colors text-left"
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={proj.image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=200"}
-                      alt={proj.title}
-                      className="w-12 h-12 rounded-md object-cover border border-outline-variant shrink-0"
-                    />
                     <div className="min-w-0">
                       <h4 className="text-xs font-bold text-primary truncate">{proj.title}</h4>
                       <p className="text-[11px] text-on-surface-variant line-clamp-2 mt-0.5">{proj.description}</p>

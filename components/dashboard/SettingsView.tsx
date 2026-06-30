@@ -34,8 +34,8 @@ export function SettingsView({ hasApiKey, handleResetState, lang }: SettingsView
           </h3>
           <p className="text-xs text-on-surface-variant mb-3">
             {lang === "vi"
-              ? "Nếu Gemini API key bị thiếu, PitchPerfect sẽ tự động chuyển sang chế độ mô phỏng sandbox thông minh."
-              : "If Gemini API key is missing, PitchPerfect automatically falls back to beautiful smart-personalized sandbox mock simulations."}
+              ? "Nếu Gemini API key bị thiếu, Synthesis AI sẽ tự động chuyển sang chế độ mô phỏng sandbox thông minh."
+              : "If Gemini API key is missing, Synthesis AI automatically falls back to beautiful smart-personalized sandbox mock simulations."}
           </p>
           <div className="p-3 bg-surface rounded-lg border border-outline-variant flex items-center justify-between">
             <span className="text-xs font-semibold text-primary">

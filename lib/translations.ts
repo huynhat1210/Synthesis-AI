@@ -57,6 +57,23 @@ export const translations = {
     generatingPitchBtn: "Đang tạo bài viết...",
     pitchGeneratedSuccess: "Bản Pitch đã được tạo thành công!",
 
+    // Skill Suggestions
+    suggestSkillsBtn: "✨ Gợi ý kỹ năng từ AI",
+    suggestSkillsLoading: "AI đang phân tích...",
+    suggestSkillsTitle: "Gợi ý kỹ năng từ JD",
+    addToProfile: "Thêm vào hồ sơ",
+
+    // Profile Templates
+    quickTemplateLabel: "Dùng Template Nhanh",
+    templateApplied: "Đã nạp template",
+    editToCustomize: "Hãy chỉnh sửa thông tin cho phù hợp với bạn!",
+
+    // Inline Pitch Editor
+    editPitch: "Chỉnh sửa",
+    doneEditing: "Xong",
+    cancelEdit: "Hủy",
+    editingMode: "Đang chỉnh sửa...",
+
     // Live Preview Panel
     livePreviewHeader: "BẢN XEM TRƯỚC BÀI PITCH",
     noPreviewLoaded: "Chưa nạp bản xem trước bài Pitch",
@@ -179,6 +196,23 @@ export const translations = {
     generatePitchBtn: "Generate Dynamic Pitch",
     generatingPitchBtn: "Generating Pitch...",
     pitchGeneratedSuccess: "Pitch generated successfully!",
+
+    // Skill Suggestions
+    suggestSkillsBtn: "✨ Suggest Skills from AI",
+    suggestSkillsLoading: "AI analyzing...",
+    suggestSkillsTitle: "AI Skill Suggestions from JD",
+    addToProfile: "Add to Profile",
+
+    // Profile Templates
+    quickTemplateLabel: "Quick Start Template",
+    templateApplied: "Template applied",
+    editToCustomize: "Customize the info to match your real experience!",
+
+    // Inline Pitch Editor
+    editPitch: "Edit",
+    doneEditing: "Done",
+    cancelEdit: "Cancel",
+    editingMode: "Editing...",
 
     // Live Preview Panel
     livePreviewHeader: "LIVE PITCH PREVIEW",

@@ -2,14 +2,18 @@
  * @file components/dashboard/DashboardView.tsx
  * @description Renders the main dashboard workspace containing
  *              profile summary and pitch generation configuration.
+ *              Features: Template Quick-Start, AI Skill Suggestions, Inline Pitch Editor.
  */
 "use client";
 
-import { Sparkles, Zap, ChevronRight, CheckCircle, Check, Copy, Share2, TrendingUp, X, RefreshCw, FileUp, FileDown, BookOpen } from "lucide-react";
+import { useState, useTransition } from "react";
+import { Sparkles, Zap, ChevronRight, CheckCircle, Check, Copy, Share2, TrendingUp, X, RefreshCw, FileUp, FileDown, BookOpen, Pencil, LayoutTemplate, Lightbulb, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import type { MasterProfile, ClientContext, GeneratedPitch } from "@/types";
 import { translations, type Language } from "@/lib/translations";
+import { suggestSkillsAction } from "@/actions/suggestSkills";
+import { PROFILE_TEMPLATES } from "@/lib/templates";
 
 interface DashboardViewProps {
   profile: MasterProfile;
@@ -22,6 +26,7 @@ interface DashboardViewProps {
   handleRemoveSkill: (skill: string) => void;
   handleGeneratePitch: () => void;
   currentResult: GeneratedPitch | null;
+  setCurrentResult: React.Dispatch<React.SetStateAction<GeneratedPitch | null>>;
   copiedScenario: string | null;
   copyToClipboard: (text: string, id: string) => void;
   setActiveTab: (tab: any) => void;
@@ -45,6 +50,7 @@ export function DashboardView({
   handleRemoveSkill,
   handleGeneratePitch,
   currentResult,
+  setCurrentResult,
   copiedScenario,
   copyToClipboard,
   setActiveTab,
@@ -56,6 +62,98 @@ export function DashboardView({
   parsingPdf,
   lang,
 }: DashboardViewProps) {
+  const t = translations[lang];
+
+  // ── Feature 1: Inline Pitch Editor ───────────────────────────────────────
+  const [editingScenario, setEditingScenario] = useState<"A" | "B" | null>(null);
+  const [editDraftA, setEditDraftA] = useState({ title: "", content: "", bullets: [] as string[] });
+  const [editDraftB, setEditDraftB] = useState({ title: "", content: "" });
+
+  const startEditA = () => {
+    if (!currentResult) return;
+    setEditDraftA({
+      title: currentResult.scenarioA.title,
+      content: currentResult.scenarioA.content,
+      bullets: [...currentResult.scenarioA.bullets],
+    });
+    setEditingScenario("A");
+  };
+
+  const startEditB = () => {
+    if (!currentResult) return;
+    setEditDraftB({ title: currentResult.scenarioB.title, content: currentResult.scenarioB.content });
+    setEditingScenario("B");
+  };
+
+  const commitEditA = () => {
+    if (!currentResult) return;
+    setCurrentResult({
+      ...currentResult,
+      scenarioA: { ...currentResult.scenarioA, ...editDraftA },
+    });
+    setEditingScenario(null);
+    showNotification(lang === "vi" ? "Kịch bản A đã được cập nhật!" : "Scenario A updated!", "success");
+  };
+
+  const commitEditB = () => {
+    if (!currentResult) return;
+    setCurrentResult({
+      ...currentResult,
+      scenarioB: { ...currentResult.scenarioB, ...editDraftB },
+    });
+    setEditingScenario(null);
+    showNotification(lang === "vi" ? "Kịch bản B đã được cập nhật!" : "Scenario B updated!", "success");
+  };
+
+  // ── Feature 2: AI Skill Suggestions ──────────────────────────────────────
+  const [isPendingSuggest, startSuggestTransition] = useTransition();
+  const [suggestedSkills, setSuggestedSkills] = useState<string[] | null>(null);
+
+  const handleSuggestSkills = () => {
+    if (!inputs.targetAudience?.trim()) {
+      showNotification(
+        lang === "vi" ? "Nhập mô tả khách hàng trước để AI phân tích." : "Enter a target audience description first.",
+        "info"
+      );
+      return;
+    }
+    startSuggestTransition(async () => {
+      const result = await suggestSkillsAction(inputs.targetAudience, profile.skills, lang);
+      if (result.data && result.data.length > 0) {
+        setSuggestedSkills(result.data);
+      } else {
+        showNotification(result.error ?? (lang === "vi" ? "Không có gợi ý mới." : "No new suggestions found."), "info");
+      }
+    });
+  };
+
+  const addSuggestedSkill = (skill: string) => {
+    if (!profile.skills.includes(skill)) {
+      const updated = { ...profile, skills: [...profile.skills, skill] };
+      setProfileState(updated);
+      showNotification(
+        lang === "vi" ? `Đã thêm kỹ năng "${skill}" vào hồ sơ!` : `Skill "${skill}" added to profile!`,
+        "success"
+      );
+    }
+    setSuggestedSkills((prev) => (prev ? prev.filter((s) => s !== skill) : null));
+  };
+
+  // ── Feature 3: Template Quick-Start ──────────────────────────────────────
+  const [showTemplates, setShowTemplates] = useState(false);
+
+  const applyTemplate = (templateId: string) => {
+    const tpl = PROFILE_TEMPLATES.find((t) => t.id === templateId);
+    if (!tpl) return;
+    setProfileState({ ...tpl.profile, id: profile.id, isDefault: profile.isDefault });
+    setShowTemplates(false);
+    showNotification(
+      `${t.templateApplied}: ${lang === "vi" ? tpl.labelVi : tpl.labelEn}. ${t.editToCustomize}`,
+      "info"
+    );
+  };
+
+  // ── PDF Export / Markdown Copy ────────────────────────────────────────────
   const handleExportPdf = () => {
     if (!currentResult) return;
     const printWindow = window.open("", "_blank");
@@ -97,7 +195,7 @@ export function DashboardView({
           ${
             currentResult.scenarioA.bullets && currentResult.scenarioA.bullets.length > 0
               ? `
-              <h3>Key Deliverables & Metrics</h3>
+              <h3>Key Deliverables &amp; Metrics</h3>
               <ul>
                 ${currentResult.scenarioA.bullets.map((b) => `<li>${b}</li>`).join("")}
               </ul>
@@ -105,7 +203,7 @@ export function DashboardView({
               : ""
           }
 
-          <h2>Proposal Scenario B: Agile & Visionary Path</h2>
+          <h2>Proposal Scenario B: Agile &amp; Visionary Path</h2>
           <p>${currentResult.scenarioB.content}</p>
 
           <div class="footer">
@@ -160,8 +258,6 @@ ${currentResult.scenarioB.content}
     showNotification("Formatted Markdown proposal copied to clipboard!", "success");
   };
 
-  const t = translations[lang];
-
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -172,23 +268,65 @@ ${currentResult.scenarioB.content}
           transition={{ type: "spring", stiffness: 100, damping: 15 }}
           className="lg:col-span-7 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm relative text-left"
         >
+          {/* Header with Template Quick-Start */}
           <div className="border-b border-outline-variant pb-4 mb-6">
-            <h3 className="text-lg font-bold font-geist text-primary uppercase">
-              {t.buildProfile}
-            </h3>
-            <p className="text-xs text-on-surface-variant mt-1">
-              {lang === "vi"
-                ? "Thông tin nền tảng chuyên môn dùng để làm căn cứ tự động viết các bài pitch cá nhân hóa."
-                : "Foundational professional context used to power your generated pitches."}
-            </p>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="text-lg font-bold font-geist text-primary uppercase">{t.buildProfile}</h3>
+                <p className="text-xs text-on-surface-variant mt-1">
+                  {lang === "vi"
+                    ? "Thông tin nền tảng chuyên môn dùng để làm căn cứ tự động viết các bài pitch cá nhân hóa."
+                    : "Foundational professional context used to power your generated pitches."}
+                </p>
+              </div>
+
+              {/* Feature 3: Template Quick-Start Button */}
+              <div className="relative shrink-0">
+                <button
+                  onClick={() => setShowTemplates((v) => !v)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-surface border border-outline-variant hover:bg-secondary/10 hover:border-secondary/40 rounded-lg text-primary transition-all cursor-pointer"
+                >
+                  <LayoutTemplate className="w-3.5 h-3.5 text-secondary" />
+                  {t.quickTemplateLabel}
+                </button>
+
+                <AnimatePresence>
+                  {showTemplates && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full right-0 mt-1.5 w-60 bg-surface border border-outline-variant rounded-xl shadow-xl z-50 overflow-hidden"
+                    >
+                      <div className="p-2 border-b border-outline-variant">
+                        <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider px-1">
+                          {lang === "vi" ? "Chọn template để điền sẵn hồ sơ" : "Select a template to pre-fill profile"}
+                        </p>
+                      </div>
+                      {PROFILE_TEMPLATES.map((tpl) => (
+                        <button
+                          key={tpl.id}
+                          onClick={() => applyTemplate(tpl.id)}
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-left hover:bg-secondary/10 transition-colors cursor-pointer group"
+                        >
+                          <span className="text-lg">{tpl.emoji}</span>
+                          <span className="font-semibold text-primary group-hover:text-secondary transition-colors">
+                            {lang === "vi" ? tpl.labelVi : tpl.labelEn}
+                          </span>
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
           </div>
 
           <div className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">
-                  {t.fullName}
-                </label>
+                <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">{t.fullName}</label>
                 <input
                   type="text"
                   value={profile.fullName}
@@ -198,9 +336,7 @@ ${currentResult.scenarioB.content}
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">
-                  {t.jobTitle}
-                </label>
+                <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">{t.jobTitle}</label>
                 <input
                   type="text"
                   value={profile.jobTitle}
@@ -212,9 +348,7 @@ ${currentResult.scenarioB.content}
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">
-                {t.bio}
-              </label>
+              <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">{t.bio}</label>
               <textarea
                 value={profile.bio}
                 onChange={(e) => setProfileState({ ...profile, bio: e.target.value })}
@@ -224,9 +358,7 @@ ${currentResult.scenarioB.content}
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">
-                {t.skills}
-              </label>
+              <label className="block text-xs font-semibold text-primary mb-1.5 uppercase tracking-wider">{t.skills}</label>
               <div className="flex flex-wrap gap-2 mb-2 p-2 border border-outline-variant rounded-lg min-h-12 bg-surface">
                 {profile.skills.map((skill, index) => (
                   <span
@@ -257,9 +389,7 @@ ${currentResult.scenarioB.content}
 
             <div>
               <div className="flex justify-between items-center mb-3">
-                <label className="text-xs font-semibold text-primary uppercase tracking-wider">
-                  {t.featuredProjects}
-                </label>
+                <label className="text-xs font-semibold text-primary uppercase tracking-wider">{t.featuredProjects}</label>
                 <button
                   onClick={() => setActiveTab("projects")}
                   className="text-xs text-secondary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
@@ -281,12 +411,8 @@ ${currentResult.scenarioB.content}
                       className="w-12 h-12 rounded-md object-cover border border-outline-variant shrink-0"
                     />
                     <div className="min-w-0">
-                      <h4 className="text-xs font-bold text-primary truncate">
-                        {proj.title}
-                      </h4>
-                      <p className="text-[11px] text-on-surface-variant line-clamp-2 mt-0.5">
-                        {proj.description}
-                      </p>
+                      <h4 className="text-xs font-bold text-primary truncate">{proj.title}</h4>
+                      <p className="text-[11px] text-on-surface-variant line-clamp-2 mt-0.5">{proj.description}</p>
                     </div>
                   </div>
                 ))}
@@ -330,6 +456,7 @@ ${currentResult.scenarioB.content}
             </div>
 
             <div className="space-y-5">
+              {/* Target Audience + Feature 2: Suggest Skills */}
               <div>
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="block text-xs font-semibold text-primary uppercase tracking-wider">
@@ -364,6 +491,61 @@ ${currentResult.scenarioB.content}
                     </div>
                   )}
                 </div>
+
+                {/* Feature 2: AI Suggest Skills Button */}
+                <button
+                  onClick={handleSuggestSkills}
+                  disabled={isPendingSuggest}
+                  className={cn(
+                    "mt-2 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer",
+                    isPendingSuggest
+                      ? "border-outline-variant text-on-surface-variant bg-surface animate-pulse"
+                      : "border-secondary/30 text-secondary bg-secondary/5 hover:bg-secondary/15"
+                  )}
+                >
+                  <Lightbulb className="w-3.5 h-3.5" />
+                  {isPendingSuggest ? t.suggestSkillsLoading : t.suggestSkillsBtn}
+                </button>
+
+                {/* Feature 2: Suggested Skills Panel */}
+                <AnimatePresence>
+                  {suggestedSkills && suggestedSkills.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-3 p-3 bg-secondary/5 border border-secondary/20 rounded-xl overflow-hidden"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="text-[10px] font-bold text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                          <Lightbulb className="w-3.5 h-3.5" />
+                          {t.suggestSkillsTitle}
+                        </h5>
+                        <button
+                          onClick={() => setSuggestedSkills(null)}
+                          className="text-on-surface-variant hover:text-error cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {suggestedSkills.map((skill) => (
+                          <button
+                            key={skill}
+                            onClick={() => addSuggestedSkill(skill)}
+                            className="flex items-center gap-1 px-2.5 py-1 bg-secondary/10 text-secondary border border-secondary/20 rounded-full text-[10px] font-bold hover:bg-secondary hover:text-on-secondary transition-all cursor-pointer"
+                          >
+                            <Plus className="w-3 h-3" />
+                            {skill}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-[9px] text-on-surface-variant mt-2">
+                        {lang === "vi" ? "Nhấn vào kỹ năng để thêm vào hồ sơ." : "Click a skill to add it to your profile."}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               <div>
@@ -507,9 +689,7 @@ ${currentResult.scenarioB.content}
       >
         <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-outline-variant pb-4 mb-6 gap-3">
           <div>
-            <h3 className="text-lg font-bold font-geist text-primary uppercase">
-              {t.livePreviewHeader}
-            </h3>
+            <h3 className="text-lg font-bold font-geist text-primary uppercase">{t.livePreviewHeader}</h3>
             <p className="text-xs text-on-surface-variant">
               {lang === "vi"
                 ? "Xem lại các kịch bản pitch đã được AI tối ưu hóa theo mục tiêu của bạn."
@@ -548,48 +728,103 @@ ${currentResult.scenarioB.content}
             </div>
             <div>
               <h4 className="text-sm font-bold text-primary font-geist">{t.noPreviewLoaded}</h4>
-              <p className="text-xs text-on-surface-variant max-w-sm mx-auto mt-1 leading-relaxed">
-                {t.noPreviewDesc}
-              </p>
+              <p className="text-xs text-on-surface-variant max-w-sm mx-auto mt-1 leading-relaxed">{t.noPreviewDesc}</p>
             </div>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Scenario A Card */}
+              {/* ── Scenario A Card ── */}
               <div className="border border-outline-variant rounded-xl p-6 bg-surface-container-low/50 hover:bg-surface-container-low/80 transition-all flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-start mb-4">
                     <span className="bg-surface-container-high text-primary-container px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">
                       {currentResult.scenarioA.label}
                     </span>
-                    <button
-                      onClick={() =>
-                        copyToClipboard(
-                          `${currentResult.scenarioA.title}\n\n${currentResult.scenarioA.content}\n\nKey Focus:\n- ${currentResult.scenarioA.bullets.join("\n- ")}`,
-                          "scenA"
-                        )
-                      }
-                      className="p-1.5 hover:bg-surface-container-high rounded text-on-surface-variant transition-colors relative cursor-pointer"
-                      title={lang === "vi" ? "Sao chép kịch bản A" : "Copy Scenario A"}
-                    >
-                      {copiedScenario === "scenA" ? (
-                        <Check className="w-4 h-4 text-secondary" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
-                    </button>
+                    <div className="flex items-center gap-1">
+                      {/* Feature 1: Edit button for Scenario A */}
+                      <button
+                        onClick={startEditA}
+                        className="p-1.5 hover:bg-secondary/10 rounded text-on-surface-variant hover:text-secondary transition-colors cursor-pointer"
+                        title={lang === "vi" ? "Chỉnh sửa kịch bản A" : "Edit Scenario A"}
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() =>
+                          copyToClipboard(
+                            `${currentResult.scenarioA.title}\n\n${currentResult.scenarioA.content}\n\nKey Focus:\n- ${currentResult.scenarioA.bullets.join("\n- ")}`,
+                            "scenA"
+                          )
+                        }
+                        className="p-1.5 hover:bg-surface-container-high rounded text-on-surface-variant transition-colors relative cursor-pointer"
+                        title={lang === "vi" ? "Sao chép kịch bản A" : "Copy Scenario A"}
+                      >
+                        {copiedScenario === "scenA" ? (
+                          <Check className="w-4 h-4 text-secondary" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
                   </div>
 
-                  <h4 className="text-xl font-serif text-primary font-bold mb-3 tracking-tight">
-                    {currentResult.scenarioA.title}
-                  </h4>
-                  <p className="text-sm text-on-surface-variant leading-relaxed mb-5">
-                    {currentResult.scenarioA.content}
-                  </p>
+                  {/* Feature 1: Inline editor for Scenario A */}
+                  <AnimatePresence mode="wait">
+                    {editingScenario === "A" ? (
+                      <motion.div
+                        key="editA"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="space-y-3"
+                      >
+                        <div className="text-[9px] font-bold text-secondary uppercase tracking-wider flex items-center gap-1">
+                          <Pencil className="w-3 h-3" /> {t.editingMode}
+                        </div>
+                        <input
+                          type="text"
+                          value={editDraftA.title}
+                          onChange={(e) => setEditDraftA({ ...editDraftA, title: e.target.value })}
+                          className="w-full border border-secondary/40 rounded-lg p-2.5 text-sm font-bold bg-surface focus:ring-2 focus:ring-secondary/20 outline-none"
+                          placeholder={lang === "vi" ? "Tiêu đề kịch bản A..." : "Scenario A title..."}
+                        />
+                        <textarea
+                          value={editDraftA.content}
+                          onChange={(e) => setEditDraftA({ ...editDraftA, content: e.target.value })}
+                          rows={6}
+                          className="w-full border border-secondary/40 rounded-lg p-2.5 text-sm bg-surface focus:ring-2 focus:ring-secondary/20 outline-none resize-none leading-relaxed"
+                          placeholder={lang === "vi" ? "Nội dung chính..." : "Main content..."}
+                        />
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            onClick={() => setEditingScenario(null)}
+                            className="px-3 py-1.5 border border-outline text-primary rounded-lg text-xs font-semibold hover:bg-surface-container-low cursor-pointer"
+                          >
+                            {t.cancelEdit}
+                          </button>
+                          <button
+                            onClick={commitEditA}
+                            className="px-3 py-1.5 bg-secondary text-on-secondary rounded-lg text-xs font-bold cursor-pointer"
+                          >
+                            {t.doneEditing}
+                          </button>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <motion.div key="viewA" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                        <h4 className="text-xl font-serif text-primary font-bold mb-3 tracking-tight">
+                          {currentResult.scenarioA.title}
+                        </h4>
+                        <p className="text-sm text-on-surface-variant leading-relaxed mb-5">
+                          {currentResult.scenarioA.content}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                {currentResult.scenarioA.bullets && currentResult.scenarioA.bullets.length > 0 && (
+                {editingScenario !== "A" && currentResult.scenarioA.bullets && currentResult.scenarioA.bullets.length > 0 && (
                   <div className="border-t border-outline-variant/60 pt-4">
                     <h5 className="text-[11px] font-bold text-primary uppercase mb-2 tracking-wider">
                       {lang === "vi" ? "Các điểm trọng tâm" : "Key Focus Dimensions"}
@@ -606,40 +841,97 @@ ${currentResult.scenarioB.content}
                 )}
               </div>
 
-              {/* Scenario B Card */}
+              {/* ── Scenario B Card ── */}
               <div className="border border-primary-container rounded-xl p-6 bg-[#0B0F19] text-white flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-start mb-4">
                     <span className="bg-white/10 text-secondary-container px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">
                       {currentResult.scenarioB.label}
                     </span>
-                    <button
-                      onClick={() =>
-                        copyToClipboard(
-                          `${currentResult.scenarioB.title}\n\n${currentResult.scenarioB.content}`,
-                          "scenB"
-                        )
-                      }
-                      className="p-1.5 hover:bg-white/10 rounded text-gray-300 transition-colors cursor-pointer"
-                      title={lang === "vi" ? "Sao chép kịch bản B" : "Copy Scenario B"}
-                    >
-                      {copiedScenario === "scenB" ? (
-                        <Check className="w-4 h-4 text-secondary-container" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
-                    </button>
+                    <div className="flex items-center gap-1">
+                      {/* Feature 1: Edit button for Scenario B */}
+                      <button
+                        onClick={startEditB}
+                        className="p-1.5 hover:bg-white/10 rounded text-gray-300 hover:text-secondary-container transition-colors cursor-pointer"
+                        title={lang === "vi" ? "Chỉnh sửa kịch bản B" : "Edit Scenario B"}
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() =>
+                          copyToClipboard(
+                            `${currentResult.scenarioB.title}\n\n${currentResult.scenarioB.content}`,
+                            "scenB"
+                          )
+                        }
+                        className="p-1.5 hover:bg-white/10 rounded text-gray-300 transition-colors cursor-pointer"
+                        title={lang === "vi" ? "Sao chép kịch bản B" : "Copy Scenario B"}
+                      >
+                        {copiedScenario === "scenB" ? (
+                          <Check className="w-4 h-4 text-secondary-container" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
                   </div>
 
-                  <h4 className="text-xl font-sans font-bold text-white mb-3 tracking-tight">
-                    {currentResult.scenarioB.title}
-                  </h4>
-                  <p className="text-sm text-gray-300 leading-relaxed mb-5">
-                    {currentResult.scenarioB.content}
-                  </p>
+                  {/* Feature 1: Inline editor for Scenario B */}
+                  <AnimatePresence mode="wait">
+                    {editingScenario === "B" ? (
+                      <motion.div
+                        key="editB"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="space-y-3"
+                      >
+                        <div className="text-[9px] font-bold text-secondary-container uppercase tracking-wider flex items-center gap-1">
+                          <Pencil className="w-3 h-3" /> {t.editingMode}
+                        </div>
+                        <input
+                          type="text"
+                          value={editDraftB.title}
+                          onChange={(e) => setEditDraftB({ ...editDraftB, title: e.target.value })}
+                          className="w-full border border-secondary-container/40 rounded-lg p-2.5 text-sm font-bold bg-white/10 text-white focus:ring-2 focus:ring-secondary-container/20 outline-none"
+                          placeholder={lang === "vi" ? "Tiêu đề kịch bản B..." : "Scenario B title..."}
+                        />
+                        <textarea
+                          value={editDraftB.content}
+                          onChange={(e) => setEditDraftB({ ...editDraftB, content: e.target.value })}
+                          rows={6}
+                          className="w-full border border-secondary-container/40 rounded-lg p-2.5 text-sm bg-white/10 text-gray-100 focus:ring-2 focus:ring-secondary-container/20 outline-none resize-none leading-relaxed"
+                          placeholder={lang === "vi" ? "Nội dung chính..." : "Main content..."}
+                        />
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            onClick={() => setEditingScenario(null)}
+                            className="px-3 py-1.5 border border-white/20 text-gray-300 rounded-lg text-xs font-semibold hover:bg-white/10 cursor-pointer"
+                          >
+                            {t.cancelEdit}
+                          </button>
+                          <button
+                            onClick={commitEditB}
+                            className="px-3 py-1.5 bg-secondary-container text-on-secondary-container rounded-lg text-xs font-bold cursor-pointer"
+                          >
+                            {t.doneEditing}
+                          </button>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <motion.div key="viewB" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                        <h4 className="text-xl font-sans font-bold text-white mb-3 tracking-tight">
+                          {currentResult.scenarioB.title}
+                        </h4>
+                        <p className="text-sm text-gray-300 leading-relaxed mb-5">
+                          {currentResult.scenarioB.content}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                {currentResult.scenarioB.stats && currentResult.scenarioB.stats.length > 0 && (
+                {editingScenario !== "B" && currentResult.scenarioB.stats && currentResult.scenarioB.stats.length > 0 && (
                   <div className="border-t border-white/10 pt-4">
                     <h5 className="text-[11px] font-bold text-secondary-container uppercase mb-2.5 tracking-wider">
                       {lang === "vi" ? "Điểm tăng tốc chiến lược" : "Strategic Accelerators"}
@@ -651,9 +943,7 @@ ${currentResult.scenarioB.content}
                           className="bg-white/5 p-3 rounded-lg border border-white/10 flex flex-col justify-between"
                         >
                           {renderIcon(stat.icon)}
-                          <span className="text-[11px] font-medium text-gray-400 mt-1 leading-snug">
-                            {stat.label}
-                          </span>
+                          <span className="text-[11px] font-medium text-gray-400 mt-1 leading-snug">{stat.label}</span>
                         </div>
                       ))}
                     </div>
@@ -665,8 +955,8 @@ ${currentResult.scenarioB.content}
             <div className="flex flex-wrap justify-between items-center gap-4 border-t border-outline-variant pt-4 mt-6">
               <div className="text-xs text-on-surface-variant">
                 {lang === "vi"
-                  ? <>Nội dung đã sẵn sàng để trình bày. Dùng <strong>Sao chép</strong> hoặc lưu vào kho lưu trữ!</>
-                  : <>Generated styled content ready to present. Use <strong>Copy</strong> or save it into the archive history!</>}
+                  ? <> Nội dung đã sẵn sàng để trình bày. Dùng <strong>Sao chép</strong> hoặc lưu vào kho lưu trữ!</>
+                  : <> Generated styled content ready to present. Use <strong>Copy</strong> or save it into the archive history!</>}
               </div>
               <div className="flex flex-wrap gap-4">
                 <button

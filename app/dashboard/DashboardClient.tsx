@@ -990,6 +990,7 @@ export function DashboardClient({
                   handleRemoveSkill={handleRemoveSkill}
                   handleGeneratePitch={handleGeneratePitch}
                   currentResult={currentResult}
+                  setCurrentResult={setCurrentResult}
                   copiedScenario={copiedScenario}
                   copyToClipboard={copyToClipboard}
                   setActiveTab={changeTab}

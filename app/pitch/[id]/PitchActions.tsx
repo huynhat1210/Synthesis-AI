@@ -72,8 +72,8 @@ export function PitchActions({ pitch, profile }: PitchActionsProps) {
     });
 
     const isVi = ctx.lang === "vi" || (pitch.context && pitch.context.lang === "vi");
-    const labelA = isVi ? "Đề xuất Chiến lược — Kịch bản A" : "Strategic Proposal — Scenario A";
-    const labelB = isVi ? "Phương án Thay thế — Kịch bản B" : "Alternative Approach — Scenario B";
+    const labelA = isVi ? "Đề xuất Chiến lược" : "Strategic Proposal";
+    const labelB = isVi ? "Phương án Thay thế" : "Alternative Approach";
     const labelGoal = isVi ? "Mục tiêu Đề xuất" : "Proposal Goal";
     const labelPrepared = isVi ? "Chuẩn bị cho" : "Prepared For";
     const labelPillars = isVi ? "Các điểm trọng tâm chiến lược" : "Strategic Focus Pillars";

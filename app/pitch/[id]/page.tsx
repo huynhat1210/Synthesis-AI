@@ -48,8 +48,8 @@ export default async function PublicPitchPage({ params, searchParams }: PitchPag
   const isVi = data.context.lang === "vi";
   const activeScenario = scenario === "B" ? "B" : "A";
 
-  const labelA = isVi ? "Đề xuất Chiến lược — Kịch bản A" : "Strategic Proposal — Scenario A";
-  const labelB = isVi ? "Phương án Thay thế — Kịch bản B" : "Alternative Approach — Scenario B";
+  const labelA = isVi ? "Đề xuất Chiến lược" : "Strategic Proposal";
+  const labelB = isVi ? "Phương án Thay thế" : "Alternative Approach";
   const labelPillars = isVi ? "Các điểm trọng tâm chiến lược" : "Strategic Focus Pillars";
 
   const isA = activeScenario === "A";

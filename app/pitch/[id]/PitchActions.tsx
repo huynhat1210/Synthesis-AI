@@ -85,6 +85,9 @@ export function PitchActions({ pitch, profileFullName, profileJobTitle }: PitchA
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Pitch — ${fullName}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 /* ─── RESET ─── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -92,208 +95,223 @@ a{color:inherit;text-decoration:none}
 
 /* ─── BASE ─── */
 html,body{
-  font-family:"Segoe UI",Arial,"Helvetica Neue",sans-serif;
-  font-size:13px;
-  line-height:1.72;
-  color:#111;
-  background:#fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  line-height: 1.75;
+  color: #1a1a1a;
+  background: #fff;
 }
 .wrap{
-  width:740px;
-  margin:0 auto;
-  padding:52px 56px 64px;
+  width: 100%;
 }
 
-/* ─── TOP RULE ─── */
+/* ─── TOP HEADER ─── */
 .top-rule{
-  border-top:3px solid #111;
-  padding-top:16px;
-  margin-bottom:28px;
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:24px;
+  border-bottom: 2px solid #111;
+  padding-bottom: 18px;
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
 }
 .brand{
-  flex-shrink:0;
+  flex-shrink: 0;
 }
 .brand-name{
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:3px;
-  text-transform:uppercase;
-  color:#111;
-  display:block;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #111;
+  display: block;
 }
 .brand-sub{
-  font-size:10px;
-  color:#888;
-  display:block;
-  margin-top:2px;
+  font-size: 10px;
+  color: #666;
+  display: block;
+  margin-top: 3px;
 }
 .meta{
-  text-align:right;
-  font-size:11px;
-  color:#555;
-  line-height:1.8;
-  flex-shrink:0;
-  max-width:320px;
+  text-align: right;
+  font-size: 11px;
+  color: #444;
+  line-height: 1.6;
+  flex-shrink: 0;
+  max-width: 380px;
 }
-.meta strong{color:#111;font-weight:700}
+.meta strong{color: #111; font-weight: 600}
 
 /* ─── DIVIDER ─── */
-.rule{border:none;border-top:1px solid #ddd;margin:24px 0}
+.rule{border: none; border-top: 1px solid #e5e5e5; margin: 28px 0}
 
 /* ─── PROFILE ROW ─── */
 .profile{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  padding:14px 18px;
-  background:#f7f7f7;
-  border-radius:6px;
-  margin-bottom:32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: #f8f9fa;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  margin-bottom: 36px;
 }
 .avatar{
-  width:42px;height:42px;
-  border-radius:50%;
-  background:#111;
-  color:#fff;
-  font-size:18px;
-  font-weight:900;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
-.pname{font-size:15px;font-weight:800;color:#111}
-.ptitle{font-size:11px;color:#666;margin-top:1px}
+.pname{font-size: 15px; font-weight: 700; color: #111}
+.ptitle{font-size: 11px; color: #666; margin-top: 2px; font-weight: 500}
 
 /* ─── SECTION LABELS ─── */
 .label{
-  font-size:9.5px;
-  font-weight:900;
-  text-transform:uppercase;
-  letter-spacing:3px;
-  color:#888;
-  margin-bottom:10px;
-  display:block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #777;
+  margin-bottom: 12px;
+  display: block;
 }
 
 /* ─── PITCH TITLE ─── */
 .pitch-title{
-  font-size:26px;
-  font-weight:900;
-  color:#111;
-  line-height:1.2;
-  margin-bottom:16px;
-  letter-spacing:-0.4px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #111;
+  line-height: 1.3;
+  margin-bottom: 18px;
+  letter-spacing: -0.5px;
 }
 
 /* ─── BODY TEXT ─── */
 .body{
-  font-size:13.5px;
-  color:#333;
-  line-height:1.78;
-  margin-bottom:28px;
+  font-size: 13px;
+  color: #2b2b2b;
+  line-height: 1.8;
+  margin-bottom: 28px;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 /* ─── PILLARS TABLE ─── */
 .pillars-head{
-  font-size:9.5px;
-  font-weight:900;
-  text-transform:uppercase;
-  letter-spacing:2.5px;
-  color:#555;
-  padding-bottom:8px;
-  border-bottom:1px solid #ddd;
-  margin-bottom:12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #444;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 12px;
 }
 .pillars-table{
-  width:100%;
-  border-collapse:collapse;
+  width: 100%;
+  border-collapse: collapse;
+}
+.pillars-table td{
+  padding: 10px 0;
+  vertical-align: top;
+  border-bottom: 1px solid #f0f0f0;
 }
 .pillars-table .check{
-  width:20px;
-  padding:7px 10px 7px 0;
-  font-weight:900;
-  color:#111;
-  vertical-align:top;
-  border-bottom:1px solid #f2f2f2;
+  width: 24px;
+  font-weight: 700;
+  color: #111;
 }
 .pillars-table .btext{
-  padding:7px 0;
-  font-size:13px;
-  color:#333;
-  line-height:1.62;
-  border-bottom:1px solid #f2f2f2;
+  font-size: 12.5px;
+  color: #333;
+  line-height: 1.7;
+  text-align: justify;
+  text-justify: inter-word;
 }
-.pillars-table tr:last-child .check,
-.pillars-table tr:last-child .btext{border-bottom:none}
+.pillars-table tr:last-child td{border-bottom: none}
 
 /* ─── SCENARIO B BOX ─── */
 .scenb{
-  background:#f4f4f4;
-  border-left:3px solid #111;
-  border-radius:0 6px 6px 0;
-  padding:22px 24px;
-  page-break-inside:avoid;
+  background: #f8f9fa;
+  border-left: 4px solid #111;
+  border-radius: 0 8px 8px 0;
+  padding: 24px 28px;
+  margin-top: 36px;
+  border-top: 1px solid #eaeaea;
+  border-right: 1px solid #eaeaea;
+  border-bottom: 1px solid #eaeaea;
+  page-break-inside: avoid;
 }
 .scenb-label{
-  font-size:9px;
-  font-weight:900;
-  text-transform:uppercase;
-  letter-spacing:2.5px;
-  color:#888;
-  margin-bottom:8px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #777;
+  margin-bottom: 10px;
 }
 .scenb-title{
-  font-size:17px;
-  font-weight:800;
-  color:#111;
-  margin-bottom:10px;
-  line-height:1.3;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 12px;
+  line-height: 1.35;
 }
 .scenb-body{
-  font-size:12.5px;
-  color:#444;
-  line-height:1.72;
+  font-size: 12.5px;
+  color: #3b3b3b;
+  line-height: 1.75;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 /* ─── STATS GRID ─── */
 .stats{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:8px;
-  margin-top:16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 18px;
 }
 .stat{
-  background:#fff;
-  border:1px solid #ddd;
-  border-radius:5px;
-  padding:10px 12px;
-  font-size:11.5px;
-  color:#333;
-  line-height:1.5;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-size: 11.5px;
+  color: #333;
+  line-height: 1.5;
+  font-weight: 500;
 }
 
 /* ─── FOOTER ─── */
 .footer{
-  margin-top:48px;
-  padding-top:16px;
-  border-top:1px solid #ddd;
-  display:flex;
-  justify-content:space-between;
-  font-size:9.5px;
-  color:#aaa;
+  margin-top: 48px;
+  padding-top: 18px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #888;
+  font-weight: 500;
 }
 
 /* ─── PAGE BREAK HELPERS ─── */
-.section{page-break-inside:avoid}
+.section{page-break-inside: avoid}
 
-/* ─── PRINT ─── */
-@page{size:A4;margin:0}
-@media print{
-  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .wrap{padding:42px 52px 56px}
+/* ─── PRINT PAGE SPEC ─── */
+@page {
+  size: A4;
+  margin: 20mm 20mm 20mm 20mm;
+}
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
 </style>
 </head>
@@ -304,7 +322,7 @@ html,body{
   <div class="top-rule">
     <div class="brand">
       <span class="brand-name">Synthesis AI</span>
-      <span class="brand-sub">Pitch Proposal</span>
+      <span class="brand-sub">Tailored Pitch Proposal</span>
     </div>
     <div class="meta">
       <div>Prepared for: <strong>${sanitize(ctx.targetAudience)}</strong></div>
@@ -354,8 +372,8 @@ html,body{
 </div>
 <script>
 window.addEventListener("load", function(){
-  setTimeout(function(){ window.print(); }, 300);
-  setTimeout(function(){ window.close(); }, 1500);
+  setTimeout(function(){ window.print(); }, 400);
+  setTimeout(function(){ window.close(); }, 2000);
 });
 </script>
 </body>

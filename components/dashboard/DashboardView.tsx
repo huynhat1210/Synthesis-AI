@@ -279,7 +279,7 @@ ${currentResult.scenarioB.content}
           initial={{ opacity: 0, x: -25 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ type: "spring", stiffness: 100, damping: 15 }}
-          className="lg:col-span-7 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm relative text-left"
+          className="lg:col-span-7 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 sm:p-6 shadow-sm relative text-left"
         >
           {/* Header with Template Quick-Start */}
           <div className="border-b border-outline-variant pb-4 mb-6">
@@ -450,7 +450,7 @@ ${currentResult.scenarioB.content}
           initial={{ opacity: 0, x: 25 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.05 }}
-          className="lg:col-span-5 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm relative overflow-hidden flex flex-col justify-between"
+          className="lg:col-span-5 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 sm:p-6 shadow-sm relative overflow-hidden flex flex-col justify-between"
         >
           <div className="absolute top-0 left-0 w-full h-1.5 bg-secondary"></div>
 
@@ -746,7 +746,7 @@ ${currentResult.scenarioB.content}
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.1 }}
-        className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm"
+        className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 sm:p-6 shadow-sm"
       >
         <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-outline-variant pb-4 mb-6 gap-3">
           <div>
@@ -796,7 +796,7 @@ ${currentResult.scenarioB.content}
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* ── Scenario A Card ── */}
-              <div className="border border-outline-variant rounded-xl p-6 bg-surface-container-low/50 hover:bg-surface-container-low/80 transition-all flex flex-col justify-between">
+              <div className="border border-outline-variant rounded-xl p-4 sm:p-6 bg-surface-container-low/50 hover:bg-surface-container-low/80 transition-all flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-start mb-4">
                     <span className="bg-surface-container-high text-primary-container px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">
@@ -915,7 +915,7 @@ ${currentResult.scenarioB.content}
               </div>
 
               {/* ── Scenario B Card ── */}
-              <div className="border border-primary-container rounded-xl p-6 bg-[#0B0F19] text-white flex flex-col justify-between">
+              <div className="border border-primary-container rounded-xl p-4 sm:p-6 bg-[#0B0F19] text-white flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-start mb-4">
                     <span className="bg-white/10 text-secondary-container px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">

@@ -1281,10 +1281,9 @@ export function DashboardClient({
         </div>
       </nav>
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden bg-background">
         {/* TopNavBar */}
-        <header className="h-16 w-full flex justify-between items-center px-6 border-b border-outline-variant bg-surface-container-lowest sticky top-0 z-10 shrink-0">
+        <header className="h-16 w-full flex justify-between items-center px-4 md:px-6 border-b border-outline-variant bg-surface-container-lowest sticky top-0 z-10 shrink-0">
           <div className="flex items-center gap-3 w-1/2">
             <Link href="/" className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer">
               <h1 className="text-lg font-bold font-geist text-primary tracking-tight">
@@ -1450,7 +1449,7 @@ export function DashboardClient({
         </AnimatePresence>
 
         {/* Main Scrollable Content */}
-        <main className="flex-1 overflow-y-auto overscroll-y-contain p-6 md:p-8 max-w-7xl mx-auto w-full">
+        <main className="flex-1 overflow-y-auto overscroll-y-contain p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}

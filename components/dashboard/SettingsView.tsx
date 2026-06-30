@@ -7,15 +7,21 @@
 import React from "react";
 import { translations, type Language } from "@/lib/translations";
 
+import type { MasterProfile } from "@/types";
+
 interface SettingsViewProps {
   hasApiKey: boolean;
   handleResetState: () => void;
   lang: Language;
+  profile: MasterProfile;
+  handleUpdatePlan: (plan: "free" | "pro") => void;
 }
 
-export function SettingsView({ hasApiKey, handleResetState, lang }: SettingsViewProps) {
+export function SettingsView({ hasApiKey, handleResetState, lang, profile, handleUpdatePlan }: SettingsViewProps) {
+  const isPro = profile.plan === "pro";
+
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm space-y-6 animate-fade-in">
+    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm space-y-6 animate-fade-in text-left">
       <div className="border-b border-outline-variant pb-4">
         <h2 className="text-xl font-bold font-geist text-primary">
           {lang === "vi" ? "CÀI ĐẶT HỆ THỐNG" : "SYSTEM SETTINGS"}
@@ -28,6 +34,37 @@ export function SettingsView({ hasApiKey, handleResetState, lang }: SettingsView
       </div>
 
       <div className="space-y-5 max-w-xl animate-fade-in">
+        {/* Plan / Subscription Status section */}
+        <div>
+          <h3 className="text-sm font-bold text-primary mb-2">
+            {lang === "vi" ? "Gói dịch vụ & Tài khoản" : "Subscription & Billing"}
+          </h3>
+          <p className="text-xs text-on-surface-variant mb-3">
+            {lang === "vi"
+              ? "Theo dõi trạng thái tài khoản của bạn. Nâng cấp lên Pro để xóa mọi giới hạn tạo kịch bản."
+              : "Track your account status. Upgrade to Pro to bypass any limit on proposal generation."}
+          </p>
+          <div className="p-4 bg-surface rounded-lg border border-outline-variant flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span className="text-xs font-bold text-primary block">
+                {lang === "vi" ? "Gói dịch vụ hiện tại:" : "Current plan:"}
+              </span>
+              <span className={`inline-block mt-1 text-xs font-black uppercase px-2.5 py-0.5 rounded ${isPro ? "bg-emerald-500/10 text-emerald-700" : "bg-slate-200 text-slate-700"}`}>
+                {isPro ? (lang === "vi" ? "Thành viên PRO" : "PRO MEMBERSHIP") : (lang === "vi" ? "Tài khoản STARTER (Miễn phí)" : "STARTER ACCOUNT (Free)")}
+              </span>
+            </div>
+            
+            <button
+              onClick={() => handleUpdatePlan(isPro ? "free" : "pro")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${isPro ? "border border-outline text-primary hover:bg-surface-container-low" : "bg-secondary text-on-secondary hover:bg-secondary/95 shadow-sm"}`}
+            >
+              {isPro
+                ? (lang === "vi" ? "Chuyển về Starter (Demo)" : "Switch to Starter (Demo)")
+                : (lang === "vi" ? "Nâng cấp lên Pro" : "Upgrade to Pro")}
+            </button>
+          </div>
+        </div>
+
         <div>
           <h3 className="text-sm font-bold text-primary mb-2">
             {lang === "vi" ? "Chế độ mô phỏng Sandbox" : "Sandbox simulation mode"}

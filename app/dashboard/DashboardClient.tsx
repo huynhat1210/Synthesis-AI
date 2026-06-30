@@ -954,6 +954,19 @@ export function DashboardClient({
           <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant/80">
             Context-Aware Generator
           </p>
+          {profile.plan === "pro" ? (
+            <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              PRO PLAN ACTIVE
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowUpgradeModal(true)}
+              className="mt-2.5 inline-flex items-center gap-1 px-3 py-1 rounded-full text-[9px] font-bold bg-slate-200 text-slate-700 hover:bg-secondary/15 hover:text-secondary border border-outline-variant/60 cursor-pointer transition-all active:scale-95"
+            >
+              ⭐ STARTER PLAN · UPGRADE
+            </button>
+          )}
         </div>
 
         {/* Profile Switcher */}
@@ -1391,6 +1404,18 @@ export function DashboardClient({
                   hasApiKey={hasApiKey}
                   lang={lang}
                   handleResetState={() => setShowResetModal(true)}
+                  profile={profile}
+                  handleUpdatePlan={async (newPlan) => {
+                    const updated = { ...profile, plan: newPlan };
+                    setProfileState(updated);
+                    showNotification(
+                      lang === "vi"
+                        ? `Đã chuyển đổi tài khoản thành ${newPlan === "pro" ? "PRO" : "Starter (Miễn phí)"}!`
+                        : `Plan switched to ${newPlan === "pro" ? "PRO" : "Starter (Free)"}!`,
+                      "success"
+                    );
+                    await syncProfileToServer(updated);
+                  }}
                 />
               )}
 

@@ -47,6 +47,7 @@ interface DashboardViewProps {
   parsingPdf: boolean;
   lang: Language;
   handlePublishScenario: (scenario: "A" | "B") => void;
+  savedPitchesCount: number;
 }
 
 export function DashboardView({
@@ -72,6 +73,7 @@ export function DashboardView({
   parsingPdf,
   lang,
   handlePublishScenario,
+  savedPitchesCount,
 }: DashboardViewProps) {
   const t = translations[lang];
 
@@ -696,14 +698,45 @@ ${currentResult.scenarioB.content}
             </div>
           </div>
 
-          <div className="pt-6 mt-6 lg:mt-0">
+          <div className="pt-6 mt-6 lg:mt-0 space-y-2.5">
             <button
               onClick={handleGeneratePitch}
-              className="w-full bg-secondary hover:bg-secondary/95 text-on-secondary px-6 py-3.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:shadow-md transition-all active:scale-98 flex justify-center items-center gap-2 cursor-pointer"
+              className="w-full bg-secondary hover:bg-secondary/95 text-on-secondary px-6 py-3.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:shadow-md transition-all active:scale-98 flex justify-center items-center gap-2 cursor-pointer animate-pulse"
             >
               <Zap className="w-4 h-4 text-on-secondary" />
               {t.generatePitchBtn}
             </button>
+
+            {/* Plan Limit usage indicator */}
+            <div className="text-center pt-1.5">
+              {profile.plan === "pro" ? (
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-500/10 text-emerald-700 text-[10px] font-black uppercase tracking-wider rounded-full border border-emerald-500/20 shadow-sm">
+                  ⚡ {lang === "vi" ? "Đã mở khóa kịch bản không giới hạn" : "Unlimited generations unlocked"}
+                </span>
+              ) : (
+                <div className="space-y-1.5 max-w-[280px] mx-auto">
+                  <div className="flex justify-between items-center text-[10px] text-on-surface-variant font-bold uppercase tracking-wider px-0.5">
+                    <span>{lang === "vi" ? "Giới hạn miễn phí:" : "Free limit:"}</span>
+                    <span className={cn(
+                      "font-black",
+                      savedPitchesCount >= 10 ? "text-error" : savedPitchesCount >= 8 ? "text-amber-600" : "text-primary"
+                    )}>
+                      {savedPitchesCount}/10 {lang === "vi" ? "đã dùng" : "used"}
+                    </span>
+                  </div>
+                  {/* Progress Bar background */}
+                  <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden border border-outline-variant/30">
+                    <div
+                      className={cn(
+                        "h-full transition-all duration-500",
+                        savedPitchesCount >= 10 ? "bg-error" : savedPitchesCount >= 8 ? "bg-amber-500" : "bg-secondary"
+                      )}
+                      style={{ width: `${Math.min((savedPitchesCount / 10) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </motion.div>
       </div>

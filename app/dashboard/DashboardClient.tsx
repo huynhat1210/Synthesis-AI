@@ -1337,6 +1337,7 @@ export function DashboardClient({
                   parsingPdf={parsingPdf}
                   lang={lang}
                   handlePublishScenario={handlePublishScenario}
+                  savedPitchesCount={savedPitches.length}
                 />
               )}
 
